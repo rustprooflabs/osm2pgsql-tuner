@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block main_content %}
+
+<div class="container-fluid">
+    <h1 class="row text-center p-4">
+      Osm2pgsql Recommendation
+    </h1>
+
+    <p class="row text-center">
+        Inputs: {{ inputs }}
+    </p>
+
+    <p class="row text-center">
+        Server should be able to allocate up to {{ rec_data.osm2pgsql_cache_max }} GB RAM to osm2pgsql.
+    </p>
+
+    <p class="row text-center">
+        Suggested command: <code>{{ rec_data.cmd | safe }}</code>
+    </p>
+
+    <p class="row text-center">
+        {% if rec_data.osm2pgsql_noslim %}
+            Not using&nbsp;<code>--slim</code>, expect {{ rec_data.osm2pgsql_noslim_cache }} GB used by osm2pgsql.
+        {% endif %}
+    </p>
+</div>
+
+{% endblock main_content %}
