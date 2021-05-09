@@ -35,8 +35,12 @@ class recommendation(object):
         self.osm2pgsql_noslim_cache = self._calculate_osm2pgsql_noslim_cache()
         self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache # No real method to this calculation, initial gut instinct
         self.osm2pgsql_noslim = self._can_i_noslim()
+        if not self.osm2pgsql_noslim and not self.append:
+            self.osm2pgsql_drop = True
+        else:
+            self.osm2pgsql_drop = False
         self.osm2pgsql_limited_ram = self._limited_ram_check()
-        
+
 
     def _limited_ram_check(self):
         """Indicates if osm2pgsql could use more RAM than the system has available.
@@ -66,6 +70,11 @@ class recommendation(object):
     def _calculate_osm2pgsql_noslim_cache(self):
         """
         https://blog.rustprooflabs.com/2021/05/osm2pgsql-reduced-ram-load-to-postgis
+
+        Returns
+        --------------------
+        required_gb : float
+            Value of memory (in GB) estimated for osm2pgsql to run w/out slim mode.
         """
         required_gb = 1 + (2.5 * self.osm_pbf_gb)
         return required_gb
@@ -93,7 +102,10 @@ class recommendation(object):
         else:
             cache = self._get_cache_mb()
             cmd += f'    --cache={cache} \ \n'
-            cmd += '    --slim --drop \ \n'
+            cmd += '    --slim \ \n'
+
+        if self.osm2pgsql_drop:
+            cmd += '    --drop \ \n'
 
         cmd += f'    --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
         cmd += '    ~/pgosm-data/your-input.osm.pbf'

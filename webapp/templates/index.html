@@ -60,7 +60,11 @@
                 </ul>
             {% endif %}
 
-            {{ form.append.label }}
+            <a href="#" data-toggle="popover"
+                title="Use append?" data-content="To use osm2pgsql's append mode requires using --slim without --drop.">
+                {{ form.append.label }}
+            </a>
+
             <br />
             {{ form.append() }}
         </div>
