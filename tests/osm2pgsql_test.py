@@ -27,9 +27,9 @@ class Osm2pgsqlTests(unittest.TestCase):
         expected = float
         self.assertEqual(expected, type(result))
 
-    def test_osm2pgsql_recommendation_osm2pgsql_noslim_type_bool(self):
+    def test_osm2pgsql_recommendation_osm2pgsql_run_in_ram_type_bool(self):
         rec = osm2pgsql.recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US)
-        result = rec.osm2pgsql_noslim
+        result = rec.osm2pgsql_run_in_ram
         expected = bool
         self.assertEqual(expected, type(result))
 
@@ -59,9 +59,9 @@ class Osm2pgsqlTests(unittest.TestCase):
         expected = 20.25
         self.assertEqual(expected, result)
 
-    def test_osm2pgsql_recommendation_osm2pgsql_noslim_value(self):
+    def test_osm2pgsql_recommendation_osm2pgsql_run_in_ram_value(self):
         rec = osm2pgsql.recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US)
-        result = rec.osm2pgsql_noslim
+        result = rec.osm2pgsql_run_in_ram
         expected = True
         self.assertEqual(expected, result)
 

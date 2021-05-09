@@ -29,23 +29,22 @@ class recommendation(object):
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
         self.pgosm_layer_set = 'run-all'
-        
+
         # Calculated attributes
         self.osm2pgsql_cache_max = self._calculate_max_osm2pgsql_cache()
         self.osm2pgsql_noslim_cache = self._calculate_osm2pgsql_noslim_cache()
         self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache # No real method to this calculation, initial gut instinct
-        self.osm2pgsql_noslim = self._can_i_noslim()
-        if not self.osm2pgsql_noslim and not self.append:
-            self.osm2pgsql_drop = True
-        else:
-            self.osm2pgsql_drop = False
+
+        self.osm2pgsql_run_in_ram = self._run_in_ram()
+        self.osm2pgsql_drop = self._use_drop()
+
         self.osm2pgsql_limited_ram = self._limited_ram_check()
 
 
     def _limited_ram_check(self):
         """Indicates if osm2pgsql could use more RAM than the system has available.
         """
-        if self.osm2pgsql_noslim:
+        if self.osm2pgsql_run_in_ram:
             # If running w/out slim is possible, already determined there is 
             # enough RAM.
             return False
@@ -53,6 +52,20 @@ class recommendation(object):
             return True
 
         return False
+
+    def _use_drop(self):
+        """Checks other parameters to determine if --drop should be used.
+
+        Returns
+        -----------------------
+        use_drop : bool
+        """
+        if not self.osm2pgsql_run_in_ram and not self.append:
+            use_drop = True
+        else:
+            use_drop = False
+
+        return use_drop
 
 
     def _calculate_max_osm2pgsql_cache(self):
@@ -79,25 +92,26 @@ class recommendation(object):
         required_gb = 1 + (2.5 * self.osm_pbf_gb)
         return required_gb
     
-    def _can_i_noslim(self):
+    def _run_in_ram(self):
         """Determines if bypassing --slim is an option with the given details.
         
         Returns
         --------------------
-        noslim_possible : bool
+        in_ram_possible : bool
         """
         if self.append:
-            noslim_possible = False
+            in_ram_possible = False
         elif self.osm2pgsql_noslim_cache <= self.osm2pgsql_cache_max:
-            noslim_possible = True
+            in_ram_possible = True
         else:
-            noslim_possible = False
-        return noslim_possible
+            in_ram_possible = False
+        return in_ram_possible
+
 
     def get_osm2pgsql_command(self, out_format='nix'):
         cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
         
-        if self.osm2pgsql_noslim:
+        if self.osm2pgsql_run_in_ram:
             pass # Nothing to do here
         else:
             cache = self._get_cache_mb()
@@ -139,7 +153,7 @@ class recommendation(object):
         print(f'Total RAM: {self.system_ram_gb} GB')
         print(f'RAM available for osm2pgsql cache: {self.osm2pgsql_cache_max} GB')
         
-        if self.osm2pgsql_noslim:
+        if self.osm2pgsql_run_in_ram:
             print('You can run w/out slim mode!')
             print(f'Cache size: {self.osm2pgsql_noslim_cache} GB ')
         else:
