@@ -41,7 +41,7 @@ def view_recommendation():
                                    append=append)
     cmd = rec.get_osm2pgsql_command(out_format='html')
     rec_data = {'cmd': cmd,
-                'osm2pgsql_noslim': rec.osm2pgsql_noslim,
+                'osm2pgsql_run_in_ram': rec.osm2pgsql_run_in_ram,
                 'osm2pgsql_noslim_cache': rec.osm2pgsql_noslim_cache,
                 'osm2pgsql_cache_max': rec.osm2pgsql_cache_max}
     return render_template('recommendation.html', inputs=inputs,
