@@ -29,6 +29,7 @@ class recommendation(object):
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
         self.pgosm_layer_set = 'run-all'
+        self.ssd = True
 
         # Calculated attributes
         self.osm2pgsql_cache_max = self._calculate_max_osm2pgsql_cache()
@@ -37,6 +38,7 @@ class recommendation(object):
 
         self.osm2pgsql_run_in_ram = self._run_in_ram()
         self.osm2pgsql_drop = self._use_drop()
+        self.osm2pgsql_flat_nodes = self._use_flat_nodes()
 
         self.osm2pgsql_limited_ram = self._limited_ram_check()
 
@@ -52,6 +54,14 @@ class recommendation(object):
             return True
 
         return False
+
+    def _use_flat_nodes(self):
+        if self.osm2pgsql_run_in_ram:
+            return False
+        elif self.osm_pbf_gb >= 2.0 and self.ssd:
+            return True
+        return False
+
 
     def _use_drop(self):
         """Checks other parameters to determine if --drop should be used.
@@ -117,9 +127,10 @@ class recommendation(object):
             cache = self._get_cache_mb()
             cmd += f'    --cache={cache} \ \n'
             cmd += '    --slim \ \n'
-
-        if self.osm2pgsql_drop:
-            cmd += '    --drop \ \n'
+            if self.osm2pgsql_drop:
+                cmd += '    --drop \ \n'
+            if self.osm2pgsql_flat_nodes:
+                cmd += '    --flat-nodes=/tmp/nodes \ \n'
 
         cmd += f'    --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
         cmd += '    ~/pgosm-data/your-input.osm.pbf'
@@ -134,7 +145,9 @@ class recommendation(object):
 
     def _get_cache_mb(self):
         """ Only needed for slim mode"""
-        if self.osm2pgsql_limited_ram:
+        if self.osm2pgsql_flat_nodes:
+            cache = 0
+        elif self.osm2pgsql_limited_ram:
             cache = int(self.osm2pgsql_cache_max * 1024)
         else:
             cache = int(self.osm2pgsql_slim_cache * 1024)
@@ -148,24 +161,3 @@ class recommendation(object):
         postgres_conf = {'shared_buffers': f'{shared_buffers_gb} GB',
                          'work_mem': f'{work_mem_mb} MB'}
         return postgres_conf
-    
-    def print(self):
-        print(f'Total RAM: {self.system_ram_gb} GB')
-        print(f'RAM available for osm2pgsql cache: {self.osm2pgsql_cache_max} GB')
-        
-        if self.osm2pgsql_run_in_ram:
-            print('You can run w/out slim mode!')
-            print(f'Cache size: {self.osm2pgsql_noslim_cache} GB ')
-        else:
-            print('Slim mode required')
-            print(self.osm2pgsql_slim_cache)
-                
-        print(f'Source PBF Size: {self.osm_pbf_gb} GB')
-        
-        osm2pgsql_command = self.get_osm2pgsql_command()
-        print()
-        print(osm2pgsql_command)
-        print()
-        print('\nWhat about Postgres CONF ?')
-        print(self._get_postgres_conf_suggestion())
-
