@@ -1,5 +1,37 @@
 # osm2pgsql-tuner
 
+## Using the API
+
+
+```bash
+curl -X GET -H 'Content-Type: application/json' \
+    http://localhost:5000/recommendation/api/v1 \
+    -d '{"system_ram_gb": 64, "osm_pbf_gb": 10.4}'
+```
+
+Optional, specify append (defaults to `false`) with the data passed with the request.
+
+```bash
+"append": true
+```
+
+Returns
+
+
+```json
+{
+  "osm2pgsql": {
+    "cmd": "osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --flat-nodes=/tmp/nodes  --output=flex --style=./run-all.lua  ~/pgosm-data/your-input.osm.pbf", 
+    "osm2pgsql_cache_max": 42.24, 
+    "osm2pgsql_drop": false, 
+    "osm2pgsql_flat_nodes": true, 
+    "osm2pgsql_limited_ram": false, 
+    "osm2pgsql_noslim_cache": 27.0, 
+    "osm2pgsql_run_in_ram": false, 
+    "osm2pgsql_slim_cache": 20.25
+  }
+}
+```
 
 
 ## Deployment Instructions

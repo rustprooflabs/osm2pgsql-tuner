@@ -2,8 +2,14 @@
 import unittest
 from webapp import osm2pgsql
 
+
 SYSTEM_RAM_GB_MAIN = 64
+SYSTEM_RAM_GB_SMALL = 1
 OSM_PBF_GB_US = 10.4
+
+OSM_PBF_GB_CO = 0.2
+OSM_PBF_GB_USWEST = 1.99 # Scaled below the 2GB threshold...
+
 
 class Osm2pgsqlTests(unittest.TestCase):
 
@@ -94,5 +100,41 @@ class Osm2pgsqlTests(unittest.TestCase):
                                        append=False)
         result = rec.osm2pgsql_drop
         expected = True
+        self.assertEqual(expected, result)
+
+    def test_osm2pgsql_recommendation_osm2pgsql_flat_nodes_value_false_with_plenty_of_ram(self):
+        rec = osm2pgsql.recommendation(system_ram_gb=SYSTEM_RAM_GB_MAIN,
+                                       osm_pbf_gb=OSM_PBF_GB_US)
+        result = rec.osm2pgsql_flat_nodes
+        expected = False
+        self.assertEqual(expected, result)
+
+    def test_osm2pgsql_recommendation_osm2pgsql_flat_nodes_value_false_when_pbf_small(self):
+        rec = osm2pgsql.recommendation(system_ram_gb=SYSTEM_RAM_GB_SMALL,
+                                       osm_pbf_gb=OSM_PBF_GB_CO)
+        result = rec.osm2pgsql_flat_nodes
+        expected = False
+        self.assertEqual(expected, result)
+
+
+    def test_osm2pgsql_recommendation_osm2pgsql_flat_nodes_value_true(self):
+        rec = osm2pgsql.recommendation(system_ram_gb=SYSTEM_RAM_GB_SMALL,
+                                       osm_pbf_gb=OSM_PBF_GB_US)
+        result = rec.osm2pgsql_flat_nodes
+        expected = True
+        self.assertEqual(expected, result)
+
+
+    def test_osm2pgsql_recommendation_osm2pgsql_cache_mb_value_zero_with_flat_nodes(self):
+        rec = osm2pgsql.recommendation(SYSTEM_RAM_GB_SMALL, OSM_PBF_GB_US)
+        result = rec._get_cache_mb()
+        expected = 0
+        self.assertEqual(expected, result)
+
+
+    def test_osm2pgsql_recommendation_osm2pgsql_cache_mb_value_limited_ram_version(self):
+        rec = osm2pgsql.recommendation(SYSTEM_RAM_GB_SMALL, OSM_PBF_GB_USWEST)
+        result = rec._get_cache_mb()
+        expected = 675
         self.assertEqual(expected, result)
 
