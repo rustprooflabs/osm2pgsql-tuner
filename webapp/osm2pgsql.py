@@ -125,18 +125,18 @@ class recommendation(object):
             pass # Nothing to do here
         else:
             cache = self._get_cache_mb()
-            cmd += f'    --cache={cache} \ \n'
-            cmd += '    --slim \ \n'
+            cmd += f' --cache={cache} \ \n'
+            cmd += ' --slim \ \n'
             if self.osm2pgsql_drop:
-                cmd += '    --drop \ \n'
+                cmd += ' --drop \ \n'
             if self.osm2pgsql_flat_nodes:
-                cmd += '    --flat-nodes=/tmp/nodes \ \n'
+                cmd += ' --flat-nodes=/tmp/nodes \ \n'
 
-        cmd += f'    --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
-        cmd += '    ~/pgosm-data/your-input.osm.pbf'
+        cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
+        cmd += ' ~/pgosm-data/your-input.osm.pbf'
 
         if out_format == 'nix':
-            pass
+            cmd = cmd.replace('\ \n', '')
         elif out_format == 'html':
             cmd = cmd.replace('\n', '<br />')
         else:
