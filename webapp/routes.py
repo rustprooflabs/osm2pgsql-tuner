@@ -2,7 +2,7 @@
 """
 import logging
 from flask import render_template, abort, request, redirect, jsonify
-from webapp import app, forms, osm2pgsql
+from webapp import app, forms, osm2pgsql, config
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -22,11 +22,12 @@ def view_root_path():
     return render_template('index.html', form=form)
 
 
-def _get_recommendation(system_ram_gb, osm_pbf_gb, append, out_format):
+def _get_recommendation(system_ram_gb, osm_pbf_gb, append, out_format, pbf_filename):
     rec = osm2pgsql.recommendation(system_ram_gb=system_ram_gb,
                                    osm_pbf_gb=osm_pbf_gb,
                                    append=append)
-    cmd = rec.get_osm2pgsql_command(out_format=out_format)
+    cmd = rec.get_osm2pgsql_command(out_format=out_format,
+                                    pbf_filename=pbf_filename)
     rec_data = {'cmd': cmd,
                 'osm2pgsql_run_in_ram': rec.osm2pgsql_run_in_ram,
                 'osm2pgsql_noslim_cache': rec.osm2pgsql_noslim_cache,
@@ -49,30 +50,41 @@ def view_recommendation():
     else:
         append = False
 
+    pbf_filename = request.args.get('pbf_filename')
+    if pbf_filename is None:
+        pbf_filename = config.DEFAULT_PBF_FILENAME
+
     rec_data = _get_recommendation(system_ram_gb, osm_pbf_gb, append,
-                                   out_format='html')
+                                   out_format='html',
+                                   pbf_filename=pbf_filename)
 
     return render_template('recommendation.html', rec_data=rec_data)
 
 
 @app.route('/recommendation/api/v1')
 def view_recommendation_api():
-    data = request.get_json()
-
     try:
-        system_ram_gb = data['system_ram_gb']
-        osm_pbf_gb = data['osm_pbf_gb']
+        system_ram_gb = float(request.args.get('system_ram_gb'))
+        osm_pbf_gb = float(request.args.get('osm_pbf_gb'))
     except KeyError:
         abort(400)
 
-    try:
-        append = data['append']
-    except KeyError:
+
+    pbf_filename = request.args.get('pbf_filename')
+    if pbf_filename is None:
+        pbf_filename = config.DEFAULT_PBF_FILENAME
+
+    append_raw = request.args.get('append')
+
+    if append_raw == 'True':
+        append = True
+    else:
         append = False
 
     rec_data = _get_recommendation(system_ram_gb, osm_pbf_gb, append,
-                                   out_format='nix')
-    return jsonify(osm2pgsql=rec_data)
+                                   out_format='nix',
+                                   pbf_filename=pbf_filename)
+    return jsonify(osm2pgsql= rec_data)
 
 
 @app.route('/about')

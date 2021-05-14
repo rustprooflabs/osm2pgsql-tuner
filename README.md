@@ -2,35 +2,36 @@
 
 ## Using the API
 
-
-```bash
-curl -X GET -H 'Content-Type: application/json' \
-    http://localhost:5000/recommendation/api/v1 \
-    -d '{"system_ram_gb": 64, "osm_pbf_gb": 10.4}'
+```python
+import requests
+api_endpoint = 'http://localhost:5000/recommendation/api/v1'
+data = {'system_ram_gb': 64, 'osm_pbf_gb': 10.4, 'append': False,
+        'pbf_filename': 'north-america-latest'}
 ```
 
-Optional, specify append (defaults to `false`) with the data passed with the request.
+Query the endpoint, check the status
 
-```bash
-"append": true
+```python
+result = requests.get(api_endpoint, params=data)
+print(f'Status code: {result.status_code}')
 ```
 
-Returns
+Get recommendation data.
 
+```python
+rec = result.json()['osm2pgsql']
+```
 
-```json
-{
-  "osm2pgsql": {
-    "cmd": "osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --flat-nodes=/tmp/nodes  --output=flex --style=./run-all.lua  ~/pgosm-data/your-input.osm.pbf", 
-    "osm2pgsql_cache_max": 42.24, 
-    "osm2pgsql_drop": false, 
-    "osm2pgsql_flat_nodes": true, 
-    "osm2pgsql_limited_ram": false, 
-    "osm2pgsql_noslim_cache": 27.0, 
-    "osm2pgsql_run_in_ram": false, 
-    "osm2pgsql_slim_cache": 20.25
-  }
-}
+Command is the most interesting part
+
+```python
+print(f"\nCommand:\n{rec['cmd']} ")
+```
+
+Other details returned used in decision making to determine the command `cmd`.
+
+```python
+print(rec.keys())
 ```
 
 

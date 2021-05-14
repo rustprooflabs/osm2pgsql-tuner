@@ -118,7 +118,7 @@ class recommendation(object):
         return in_ram_possible
 
 
-    def get_osm2pgsql_command(self, out_format='nix'):
+    def get_osm2pgsql_command(self, out_format, pbf_filename):
         cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
         
         if self.osm2pgsql_run_in_ram:
@@ -133,7 +133,7 @@ class recommendation(object):
                 cmd += ' --flat-nodes=/tmp/nodes \ \n'
 
         cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
-        cmd += ' ~/pgosm-data/your-input.osm.pbf'
+        cmd += f' ~/pgosm-data/{pbf_filename}.osm.pbf'
 
         if out_format == 'nix':
             cmd = cmd.replace('\ \n', '')

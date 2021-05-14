@@ -33,3 +33,5 @@ try:
         APP_DEBUG = True
 except KeyError:
     APP_DEBUG = True
+
+DEFAULT_PBF_FILENAME = 'colorado-latest'
