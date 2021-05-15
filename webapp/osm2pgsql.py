@@ -11,7 +11,8 @@
 class recommendation(object):
 
     def __init__(self, system_ram_gb, osm_pbf_gb, append=False):
-        """osm2pgsql.recommendation class takes basic inputs to generate command suggestions for osm2pgsql.
+        """osm2pgsql.recommendation class takes basic inputs to generate
+        command suggestions for osm2pgsql.
 
         Parameters
         -----------------------
@@ -34,7 +35,8 @@ class recommendation(object):
         # Calculated attributes
         self.osm2pgsql_cache_max = self._calculate_max_osm2pgsql_cache()
         self.osm2pgsql_noslim_cache = self._calculate_osm2pgsql_noslim_cache()
-        self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache # No real method to this calculation, initial gut instinct
+        # No real method to this calculation, initial gut instinct
+        self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache
 
         self.osm2pgsql_run_in_ram = self._run_in_ram()
         self.osm2pgsql_drop = self._use_drop()
@@ -47,7 +49,7 @@ class recommendation(object):
         """Indicates if osm2pgsql could use more RAM than the system has available.
         """
         if self.osm2pgsql_run_in_ram:
-            # If running w/out slim is possible, already determined there is 
+            # If running w/out slim is possible, already determined there is
             # enough RAM.
             return False
         elif self.osm2pgsql_slim_cache > self.osm2pgsql_cache_max:
@@ -80,7 +82,7 @@ class recommendation(object):
 
     def _calculate_max_osm2pgsql_cache(self):
         """Calculates the max RAM server has available to dedicate to osm2pgsql cache.
-        
+
         Using 2/3 total as a starting point
 
 		Returns
@@ -101,10 +103,10 @@ class recommendation(object):
         """
         required_gb = 1 + (2.5 * self.osm_pbf_gb)
         return required_gb
-    
+
     def _run_in_ram(self):
         """Determines if bypassing --slim is an option with the given details.
-        
+
         Returns
         --------------------
         in_ram_possible : bool
@@ -120,7 +122,7 @@ class recommendation(object):
 
     def get_osm2pgsql_command(self, out_format, pbf_filename):
         cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
-        
+
         if self.osm2pgsql_run_in_ram:
             pass # Nothing to do here
         else:
@@ -157,7 +159,7 @@ class recommendation(object):
     def _get_postgres_conf_suggestion(self):
         shared_buffers_gb = 1
         work_mem_mb = 50
-        
+
         postgres_conf = {'shared_buffers': f'{shared_buffers_gb} GB',
                          'work_mem': f'{work_mem_mb} MB'}
         return postgres_conf
