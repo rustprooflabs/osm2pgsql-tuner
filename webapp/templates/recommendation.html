@@ -9,7 +9,10 @@
     <p class="row text-center">
         Server should be able to allocate up to
         {{ "%.1f"|format(rec_data.osm2pgsql_cache_max) }} GB RAM to osm2pgsql.
-        
+    </p>
+
+    <p class="row text-center">
+        Running in-memory requires {{ rec_data.osm2pgsql_noslim_cache }} GB RAM.
     </p>
 
     <div class="row p-3">
@@ -20,7 +23,6 @@
 
             <code class="row">{{ rec_data.cmd | safe }}</code>
         </div>
-        
     </div>
 
     <p class="row text-center">
