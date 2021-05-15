@@ -44,7 +44,11 @@
                 </ul>
             {% endif %}
 
-            {{ form.osm_pbf_gb.label }}
+            <a href="#" data-toggle="popover"
+                title="PBF Sizes" data-content="PBF sizes (in GB) based on details from Geofabrik's download server (https://download.geofabrik.de) on 5/15/2021.">
+                {{ form.osm_pbf_gb.label }}
+            </a>
+
             <br />
             {{ form.osm_pbf_gb() }}
         </div>

@@ -35,3 +35,14 @@ except KeyError:
     APP_DEBUG = True
 
 DEFAULT_PBF_FILENAME = 'colorado-latest'
+
+PBF_GB_SIZES = {'Colorado': 0.203,
+                'California': 0.893,
+                'Norway': 1,
+                'Germany': 3.4,
+                'Africa': 4.5,
+                'North America': 10.4,
+                'Europe': 23.4}
+"""PBF sizes for reference based on details from
+Geofabrik's download server on 5/15/2021.
+"""

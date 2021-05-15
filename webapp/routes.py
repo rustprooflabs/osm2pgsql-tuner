@@ -4,6 +4,7 @@ import logging
 from flask import render_template, abort, request, redirect, jsonify
 from webapp import app, forms, osm2pgsql, config
 
+api_uri = '/api/v1'
 
 @app.route('/', methods=['GET', 'POST'])
 def view_root_path():
@@ -21,13 +22,39 @@ def view_root_path():
 
     return render_template('index.html', form=form)
 
+def _get_api_params():
+    try:
+        system_ram_gb = float(request.args.get('system_ram_gb'))
+        osm_pbf_gb = float(request.args.get('osm_pbf_gb'))
+    except KeyError:
+        abort(400)
 
-def _get_recommendation(system_ram_gb, osm_pbf_gb, append, out_format, pbf_filename):
-    rec = osm2pgsql.recommendation(system_ram_gb=system_ram_gb,
-                                   osm_pbf_gb=osm_pbf_gb,
-                                   append=append)
+    pbf_filename = request.args.get('pbf_filename')
+    if pbf_filename is None:
+        pbf_filename = config.DEFAULT_PBF_FILENAME
+
+    append_raw = request.args.get('append')
+
+    if append_raw == 'True':
+        append = True
+    else:
+        append = False
+
+    api_params = {'system_ram_gb': system_ram_gb,
+                  'osm_pbf_gb': osm_pbf_gb,
+                  'append': append,
+                  'pbf_filename': pbf_filename}
+
+    return api_params
+
+def _get_recommendation(out_format):
+    api_params = _get_api_params()
+
+    rec = osm2pgsql.recommendation(system_ram_gb=api_params['system_ram_gb'],
+                                   osm_pbf_gb=api_params['osm_pbf_gb'],
+                                   append=api_params['append'])
     cmd = rec.get_osm2pgsql_command(out_format=out_format,
-                                    pbf_filename=pbf_filename)
+                                    pbf_filename=api_params['pbf_filename'])
     rec_data = {'cmd': cmd,
                 'osm2pgsql_run_in_ram': rec.osm2pgsql_run_in_ram,
                 'osm2pgsql_noslim_cache': rec.osm2pgsql_noslim_cache,
@@ -41,49 +68,14 @@ def _get_recommendation(system_ram_gb, osm_pbf_gb, append, out_format, pbf_filen
 
 @app.route('/recommendation')
 def view_recommendation():
-    system_ram_gb = float(request.args.get('system_ram_gb'))
-    osm_pbf_gb = float(request.args.get('osm_pbf_gb'))
-    append_raw = request.args.get('append')
-
-    if append_raw == 'True':
-        append = True
-    else:
-        append = False
-
-    pbf_filename = request.args.get('pbf_filename')
-    if pbf_filename is None:
-        pbf_filename = config.DEFAULT_PBF_FILENAME
-
-    rec_data = _get_recommendation(system_ram_gb, osm_pbf_gb, append,
-                                   out_format='html',
-                                   pbf_filename=pbf_filename)
-
+    rec_data = _get_recommendation(out_format='html')
+    params = request.args
     return render_template('recommendation.html', rec_data=rec_data)
 
 
-@app.route('/recommendation/api/v1')
+@app.route(api_uri)
 def view_recommendation_api():
-    try:
-        system_ram_gb = float(request.args.get('system_ram_gb'))
-        osm_pbf_gb = float(request.args.get('osm_pbf_gb'))
-    except KeyError:
-        abort(400)
-
-
-    pbf_filename = request.args.get('pbf_filename')
-    if pbf_filename is None:
-        pbf_filename = config.DEFAULT_PBF_FILENAME
-
-    append_raw = request.args.get('append')
-
-    if append_raw == 'True':
-        append = True
-    else:
-        append = False
-
-    rec_data = _get_recommendation(system_ram_gb, osm_pbf_gb, append,
-                                   out_format='nix',
-                                   pbf_filename=pbf_filename)
+    rec_data = _get_recommendation(out_format='api')
     return jsonify(osm2pgsql= rec_data)
 
 

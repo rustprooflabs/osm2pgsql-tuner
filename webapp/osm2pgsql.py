@@ -137,12 +137,12 @@ class recommendation(object):
         cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
         cmd += f' ~/pgosm-data/{pbf_filename}.osm.pbf'
 
-        if out_format == 'nix':
+        if out_format == 'api':
             cmd = cmd.replace('\ \n', '')
         elif out_format == 'html':
             cmd = cmd.replace('\n', '<br />')
         else:
-            raise ValueError(f'Invalid out_format: {out_format}. Valid values are nix and html')
+            raise ValueError(f'Invalid out_format: {out_format}. Valid values are "api" and "html"')
         return cmd
 
     def _get_cache_mb(self):
