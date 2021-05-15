@@ -15,19 +15,21 @@ def _get_pbf_gb_choices():
     """
     pbf_gb_choices = list()
     for key, value in config.PBF_GB_SIZES.items():
-        choice = (value, f'{key} ({value} GB)')
+        choice = (key,
+                  f"{key} ({value['size_gb']} GB)")
         pbf_gb_choices.append(choice)
 
     return pbf_gb_choices
+
 
 class Osm2pgsqlTunerInput(FlaskForm):
     system_ram_gb = SelectField('System RAM (GB)',
                                 default=64,
                                 choices=[4, 8, 16, 32, 64, 128, 256])
     pbf_gb_choices = _get_pbf_gb_choices()
-    osm_pbf_gb = SelectField('OSM PBF size (GB)',
-                             default=10.4,
-                             choices=pbf_gb_choices)
+    osm_pbf = SelectField('OSM PBF size (GB)',
+                          default='North America',
+                          choices=pbf_gb_choices)
     append = BooleanField('Use Append?', default=False)
     ssd = SelectField('Using SSD?', default='Yes, SSD',
                        choices=['Yes, SSD'])

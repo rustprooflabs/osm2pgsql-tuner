@@ -13,11 +13,15 @@ def view_root_path():
 
     if form.validate_on_submit():
         system_ram_gb = form.system_ram_gb.data
-        osm_pbf_gb = form.osm_pbf_gb.data
+        osm_pbf = form.osm_pbf.data
+        osm_pbf_details = config.PBF_GB_SIZES[osm_pbf]
+        osm_pbf_gb = osm_pbf_details['size_gb']
+        pbf_filename = osm_pbf_details['filename']
         append = form.append.data
         url_params = f'system_ram_gb={system_ram_gb}'
         url_params += f'&osm_pbf_gb={osm_pbf_gb}'
         url_params += f'&append={append}'
+        url_params += f'&pbf_filename={pbf_filename}'
         return redirect(f'/recommendation?{url_params}')
 
     return render_template('index.html', form=form)
@@ -30,6 +34,7 @@ def _get_api_params():
         abort(400)
 
     pbf_filename = request.args.get('pbf_filename')
+
     if pbf_filename is None:
         pbf_filename = config.DEFAULT_PBF_FILENAME
 

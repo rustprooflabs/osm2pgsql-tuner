@@ -36,9 +36,9 @@
         </div>
 
         <div class="form-group p-1">
-            {% if form.osm_pbf_gb.errors%}
+            {% if form.osm_pbf.errors%}
                 <ul>
-                {% for error in form.osm_pbf_gb.errors %}
+                {% for error in form.osm_pbf.errors %}
                     <li>{{ error }}</li>
                 {% endfor %}
                 </ul>
@@ -46,11 +46,11 @@
 
             <a href="#" data-toggle="popover"
                 title="PBF Sizes" data-content="PBF sizes (in GB) based on details from Geofabrik's download server (https://download.geofabrik.de) on 5/15/2021.">
-                {{ form.osm_pbf_gb.label }}
+                {{ form.osm_pbf.label }}
             </a>
 
             <br />
-            {{ form.osm_pbf_gb() }}
+            {{ form.osm_pbf() }}
         </div>
     </div>
     <div class="form-row text-center">
