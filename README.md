@@ -4,15 +4,20 @@
 
 ```python
 import requests
-api_endpoint = 'http://localhost:5000/recommendation/api/v1'
-data = {'system_ram_gb': 64, 'osm_pbf_gb': 10.4, 'append': False,
-        'pbf_filename': 'north-america-latest'}
+
+system_ram_gb = 64
+osm_pbf_gb = 10.4
+pbf_filename = 'north-america-latest'
+append = False
+
+api_endpoint = 'https://osm2pgsql-tuner.com/api/v1'
+api_endpoint += f'?system_ram_gb={system_ram_gb}&osm_pbf_gb={osm_pbf_gb}&append={append}&pbf_filename={pbf_filename}'
 ```
 
 Query the endpoint, check the status
 
 ```python
-result = requests.get(api_endpoint, params=data)
+result = requests.get(api_endpoint)
 print(f'Status code: {result.status_code}')
 ```
 
