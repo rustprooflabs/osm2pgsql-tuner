@@ -10,7 +10,8 @@
 
 class recommendation(object):
 
-    def __init__(self, system_ram_gb, osm_pbf_gb, append=False):
+    def __init__(self, system_ram_gb, osm_pbf_gb, append=False,
+                 pgosm_layer_set='run-all'):
         """osm2pgsql.recommendation class takes basic inputs to generate
         command suggestions for osm2pgsql.
 
@@ -29,7 +30,7 @@ class recommendation(object):
         self.system_ram_gb = system_ram_gb
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
-        self.pgosm_layer_set = 'run-all'
+        self.pgosm_layer_set = pgosm_layer_set
         self.ssd = True
 
         # Calculated attributes

@@ -22,6 +22,7 @@ def view_root_path():
         url_params += f'&osm_pbf_gb={osm_pbf_gb}'
         url_params += f'&append={append}'
         url_params += f'&pbf_filename={pbf_filename}'
+        url_params += f'&pgosm_layer_set=run-all'
         return redirect(f'/recommendation?{url_params}')
 
     return render_template('index.html', form=form)
@@ -45,10 +46,16 @@ def _get_api_params():
     else:
         append = False
 
+    if request.args.get('pgosm_layer_set'):
+        pgosm_layer_set = request.args.get('pgosm_layer_set')
+    else:
+        pgosm_layer_set = 'run-all'
+
     api_params = {'system_ram_gb': system_ram_gb,
                   'osm_pbf_gb': osm_pbf_gb,
                   'append': append,
-                  'pbf_filename': pbf_filename}
+                  'pbf_filename': pbf_filename,
+                  'pgosm_layer_set': pgosm_layer_set}
 
     return api_params
 
@@ -57,7 +64,8 @@ def _get_recommendation(out_format):
 
     rec = osm2pgsql.recommendation(system_ram_gb=api_params['system_ram_gb'],
                                    osm_pbf_gb=api_params['osm_pbf_gb'],
-                                   append=api_params['append'])
+                                   append=api_params['append'],
+                                   pgosm_layer_set=api_params['pgosm_layer_set'])
     cmd = rec.get_osm2pgsql_command(out_format=out_format,
                                     pbf_filename=api_params['pbf_filename'])
     rec_data = {'cmd': cmd,
