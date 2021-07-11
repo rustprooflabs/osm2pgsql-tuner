@@ -75,7 +75,9 @@ def _get_recommendation(out_format):
                 'osm2pgsql_slim_cache': rec.osm2pgsql_slim_cache,
                 'osm2pgsql_drop': rec.osm2pgsql_drop,
                 'osm2pgsql_flat_nodes': rec.osm2pgsql_flat_nodes,
-                'osm2pgsql_limited_ram': rec.osm2pgsql_limited_ram}
+                'osm2pgsql_limited_ram': rec.osm2pgsql_limited_ram,
+                'system_ram_gb': rec.system_ram_gb,
+                'osm2pgsql_append': rec.append}
 
     return rec_data
 
