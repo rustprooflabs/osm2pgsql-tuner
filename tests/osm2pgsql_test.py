@@ -9,6 +9,7 @@ OSM_PBF_GB_US = 10.4
 
 OSM_PBF_GB_CO = 0.2
 OSM_PBF_GB_USWEST = 1.99 # Scaled below the 2GB threshold...
+OSM_PBF_GB_ALWAYS_FLAT_FILE = 30.1 # Should always use flat file, even w/out SSD
 
 
 class Osm2pgsqlTests(unittest.TestCase):
@@ -120,6 +121,15 @@ class Osm2pgsqlTests(unittest.TestCase):
     def test_osm2pgsql_recommendation_osm2pgsql_flat_nodes_value_true(self):
         rec = osm2pgsql.recommendation(system_ram_gb=SYSTEM_RAM_GB_SMALL,
                                        osm_pbf_gb=OSM_PBF_GB_US)
+        result = rec.osm2pgsql_flat_nodes
+        expected = True
+        self.assertEqual(expected, result)
+
+
+    def test_osm2pgsql_recommendation_osm2pgsql_flat_nodes_value_true_no_ssd_when_pbf_gt30(self):
+        rec = osm2pgsql.recommendation(system_ram_gb=SYSTEM_RAM_GB_SMALL,
+                                       osm_pbf_gb=OSM_PBF_GB_ALWAYS_FLAT_FILE,
+                                       ssd=False)
         result = rec.osm2pgsql_flat_nodes
         expected = True
         self.assertEqual(expected, result)
