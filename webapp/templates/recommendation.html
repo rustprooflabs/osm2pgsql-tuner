@@ -3,27 +3,44 @@
 
 <div class="container-fluid">
     <h1 class="row text-center p-4">
-      Osm2pgsql Recommendation
+      Recommended osm2pgsql command
     </h1>
 
-    <p class="row text-center">
-        Server should be able to allocate up to
-        {{ "%.1f"|format(rec_data.osm2pgsql_cache_max) }} GB RAM to osm2pgsql.
-    </p>
-
-    <p class="row text-center">
-        Running in-memory requires {{ rec_data.osm2pgsql_noslim_cache }} GB RAM.
-    </p>
 
     <div class="row p-3">
-        <div class="col-md-8">
-            <div class="row">
-            Suggested command:
-            </div>
+        <p class="col-md-6">
+            <code>
+                {{ rec_data.cmd | safe }}
+            </code>
+        </p>
+    </div>
 
-            <code class="row">{{ rec_data.cmd | safe }}</code>
+    <div class="row p-3 text-center">
+        <h2 class="col-md-12">
+            Explanation
+        </h2>
+
+
+        <div class="col-md-8">
+            {% if rec_data.osm2pgsql_append %}
+                <p class="row text-center alert alert-warning">
+                    Append method requires&nbsp;<code>--slim</code>&nbsp;without
+                    &nbsp;<code>--drop</code>.
+                </p>
+
+            {% endif %}
+
+                <p class="row text-center">
+                    A server with {{ rec_data.system_ram_gb }} GB RAM should be able to allow up to
+                    {{ "%.1f"|format(rec_data.osm2pgsql_cache_max) }} GB RAM to osm2pgsql
+                    and still give room for Postgres.
+
+                    Running osm2pgsql entirely in-memory requires
+                    {{ "%.1f"|format(rec_data.osm2pgsql_noslim_cache) }} GB RAM.
+                </p>
         </div>
     </div>
+
 
     <p class="row text-center">
         {% if rec_data.osm2pgsql_noslim %}

@@ -6,12 +6,13 @@
 
     Assuming this will be included in v1.4.3 when it is tagged/released
 """
+from webapp import config
 
 
 class recommendation(object):
 
     def __init__(self, system_ram_gb, osm_pbf_gb, append=False,
-                 pgosm_layer_set='run-all'):
+                 pgosm_layer_set='run-all', ssd=True):
         """osm2pgsql.recommendation class takes basic inputs to generate
         command suggestions for osm2pgsql.
 
@@ -31,7 +32,7 @@ class recommendation(object):
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
         self.pgosm_layer_set = pgosm_layer_set
-        self.ssd = True
+        self.ssd = ssd
 
         # Calculated attributes
         self.osm2pgsql_cache_max = self._calculate_max_osm2pgsql_cache()
@@ -59,9 +60,23 @@ class recommendation(object):
         return False
 
     def _use_flat_nodes(self):
+        """Returns `True` if `--flat-nodes` should be used.
+
+        Use `--flat-nodes` when:
+            * PBF size is larger than config'd threshold AND SSD
+            * PBF >= 30 GB (regardless of SSD)
+
+        If the load can run entirely in-memory, no need to use flat nodes.
+
+        Returns
+        ---------------------
+        use_flat_nodes : bool
+        """
         if self.osm2pgsql_run_in_ram:
             return False
-        elif self.osm_pbf_gb >= 2.0 and self.ssd:
+        elif self.osm_pbf_gb >= config.FLAT_NODES_THRESHOLD_GB and self.ssd:
+            return True
+        elif self.osm_pbf_gb >= 30.0:
             return True
         return False
 

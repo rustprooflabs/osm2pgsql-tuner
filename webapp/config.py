@@ -47,3 +47,5 @@ PBF_GB_SIZES = {'Colorado': {'size_gb': 0.203, 'filename': 'colorado-latest'},
 """PBF sizes for reference based on details from
 Geofabrik's download server on 5/15/2021.
 """
+
+FLAT_NODES_THRESHOLD_GB = 8.0
