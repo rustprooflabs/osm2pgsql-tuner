@@ -42,10 +42,13 @@ PBF_GB_SIZES = {'Colorado': {'size_gb': 0.203, 'filename': 'colorado-latest'},
                 'Germany': {'size_gb': 3.4, 'filename': 'germany-latest'},
                 'Africa': {'size_gb': 4.5, 'filename': 'africa-latest'},
                 'North America': {'size_gb': 10.4, 'filename': 'north-america-latest'},
-                'Europe': {'size_gb': 23.4, 'filename': 'europe-latest'}
+                'Europe': {'size_gb': 23.4, 'filename': 'europe-latest'},
+                'Planet': {'size_gb': 59.0, 'filename': 'planet-latest'}
                 }
-"""PBF sizes for reference based on details from
+"""Regional PBF sizes for reference based on details from
 Geofabrik's download server on 5/15/2021.
+
+Planet PBF size from https://planet.openstreetmap.org/pbf/ on 7/21/2021.
 """
 
 FLAT_NODES_THRESHOLD_GB = 8.0

@@ -1,10 +1,6 @@
 """Contains osm2pgsql class to help provide osm2pgsql tuning advice.
-"""
-"""Requires osm2pgsql commit 94dae34 or newer
 
-    https://github.com/openstreetmap/osm2pgsql/commit/94dae34b7aa1463339cdb6768d28a6e8ee53ef65
-
-    Assuming this will be included in v1.4.3 when it is tagged/released
+Requires osm2pgsql v1.5.0 or newer
 """
 from webapp import config
 
