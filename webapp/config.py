@@ -1,8 +1,7 @@
 import os
-import logging
+
 
 APP_NAME = 'osm2pgsql-tuner'
-
 
 CURR_PATH = os.path.abspath(os.path.dirname(__file__))
 PROJECT_BASE_PATH = os.path.abspath(os.path.join(CURR_PATH, os.pardir))
