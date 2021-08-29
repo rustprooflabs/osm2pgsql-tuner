@@ -30,6 +30,8 @@ class recommendation(object):
         self.pgosm_layer_set = pgosm_layer_set
         self.ssd = ssd
 
+        self.decisions = list()
+
         # Calculated attributes
         self.osm2pgsql_cache_max = self._calculate_max_osm2pgsql_cache()
         self.osm2pgsql_noslim_cache = self._calculate_osm2pgsql_noslim_cache()
@@ -37,13 +39,13 @@ class recommendation(object):
         self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache
 
         self.osm2pgsql_run_in_ram = self._run_in_ram()
-        self.osm2pgsql_drop = self._use_drop()
-        self.osm2pgsql_flat_nodes = self._use_flat_nodes()
+        self.osm2pgsql_drop = self.use_drop()
+        self.osm2pgsql_flat_nodes = self.use_flat_nodes()
 
-        self.osm2pgsql_limited_ram = self._limited_ram_check()
+        self.osm2pgsql_limited_ram = self.limited_ram_check()
 
 
-    def _limited_ram_check(self):
+    def limited_ram_check(self):
         """Indicates if osm2pgsql could use more RAM than the system has available.
         """
         if self.osm2pgsql_run_in_ram:
@@ -55,7 +57,7 @@ class recommendation(object):
 
         return False
 
-    def _use_flat_nodes(self):
+    def use_flat_nodes(self):
         """Returns `True` if `--flat-nodes` should be used.
 
         Use `--flat-nodes` when:
@@ -69,25 +71,56 @@ class recommendation(object):
         use_flat_nodes : bool
         """
         if self.osm2pgsql_run_in_ram:
+            decision = {'option': '--flat-node',
+                        'name': 'Sufficient RAM',
+                        'desc': 'No reason to consider --flat-nodes'}
+            self.decisions.append(decision)
             return False
         elif self.osm_pbf_gb >= config.FLAT_NODES_THRESHOLD_GB and self.ssd:
+            decision = {'option': '--flat-node',
+                        'name': 'File of sufficient size',
+                        'desc': 'File is large enough to consider --flat-nodes'}
+            self.decisions.append(decision)
             return True
         elif self.osm_pbf_gb >= 30.0:
+            decision = {'option': '--flat-node',
+                        'name': 'File of sufficient size',
+                        'desc': 'File is large enough to consider --flat-nodes'}
+            self.decisions.append(decision)
             return True
+
+        decision = {'option': '--flat-node',
+                    'name': 'Not using',
+                    'desc': 'No reason to use --flat-nodes'}
+        self.decisions.append(decision)
         return False
 
 
-    def _use_drop(self):
+    def use_drop(self):
         """Checks other parameters to determine if --drop should be used.
 
         Returns
         -----------------------
         use_drop : bool
         """
-        if not self.osm2pgsql_run_in_ram and not self.append:
-            use_drop = True
-        else:
+        if self.osm2pgsql_run_in_ram:
             use_drop = False
+            decision = {'option': '--drop',
+                        'name': 'Sufficient RAM',
+                        'desc': 'Import can run entirely in RAM, --drop not needed.'}
+            self.decisions.append(decision)
+        elif self.append:
+            use_drop = False
+            decision = {'option': '--drop',
+                        'name': 'Using Append',
+                        'desc': 'Using --append, cannot use --drop'}
+            self.decisions.append(decision)
+        else:
+            use_drop = True
+            decision = {'option': '--drop',
+                        'name': 'Using Drop',
+                        'desc': 'No reason not to use --drop'}
+            self.decisions.append(decision)
 
         return use_drop
 
@@ -138,7 +171,7 @@ class recommendation(object):
         if self.osm2pgsql_run_in_ram:
             pass # Nothing to do here
         else:
-            cache = self._get_cache_mb()
+            cache = self.get_cache_mb()
             cmd += f' --cache={cache} \ \n'
             cmd += ' --slim \ \n'
             if self.osm2pgsql_drop:
@@ -157,16 +190,36 @@ class recommendation(object):
             raise ValueError(f'Invalid out_format: {out_format}. Valid values are "api" and "html"')
         return cmd
 
-    def _get_cache_mb(self):
-        """ Only needed for slim mode"""
+
+    def get_cache_mb(self):
+        """Returns cache size to set in MB.
+
+        Only needed for slim mode
+
+        Returns
+        ----------------------
+        cache : int
+            Size in MB to set --cache
+        """
         if self.osm2pgsql_flat_nodes:
             cache = 0
+            decision = {'option': '--cache',
+                        'name': 'Using --flat-nodes',
+                        'desc': 'Set --cache 0.'}
         elif self.osm2pgsql_limited_ram:
             cache = int(self.osm2pgsql_cache_max * 1024)
+            decision = {'option': '--cache',
+                        'name': 'Limited RAM',
+                        'desc': 'Setting --cache to max available.'}
         else:
             cache = int(self.osm2pgsql_slim_cache * 1024)
+            decision = {'option': '--cache',
+                        'name': 'Sufficient RAM',
+                        'desc': 'Set --cache to expected requirement for given PBF size.'}
 
+        self.decisions.append(decision)
         return cache
+
 
     def _get_postgres_conf_suggestion(self):
         shared_buffers_gb = 1

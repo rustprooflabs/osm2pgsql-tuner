@@ -68,7 +68,7 @@ def _get_recommendation(out_format):
                                    pgosm_layer_set=api_params['pgosm_layer_set'])
     cmd = rec.get_osm2pgsql_command(out_format=out_format,
                                     pbf_filename=api_params['pbf_filename'])
-    rec_data = {'cmd': cmd,
+    rec_data = {'cmd': cmd, 'decisions': rec.decisions,
                 'osm2pgsql_run_in_ram': rec.osm2pgsql_run_in_ram,
                 'osm2pgsql_noslim_cache': rec.osm2pgsql_noslim_cache,
                 'osm2pgsql_cache_max': rec.osm2pgsql_cache_max,
