@@ -6,7 +6,6 @@
       Recommended osm2pgsql command
     </h1>
 
-
     <div class="row p-3">
         <p class="col-md-6">
             <code>
@@ -47,6 +46,26 @@
             Not using&nbsp;<code>--slim</code>, expect {{ rec_data.osm2pgsql_noslim_cache }} GB used by osm2pgsql.
         {% endif %}
     </p>
+
+    <div class="row text-center">
+        <div class="col-md-8">
+            <table class="table table-striped table-hover">
+                <tr>
+                    <th>Option</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            {% for decision in rec_data.decisions %}
+                <tr>
+                    <td>{{ decision['option'] }}</td>
+                    <td>{{ decision['name'] }}</td>
+                    <td>{{ decision['desc'] }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+
 </div>
 
 {% endblock main_content %}
