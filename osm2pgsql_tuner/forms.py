@@ -2,7 +2,7 @@
 from wtforms import TextAreaField, DecimalField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange
 from flask_wtf import FlaskForm
-from webapp import config
+from osm2pgsql_tuner import config
 
 
 def _get_pbf_gb_choices():

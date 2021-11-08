@@ -2,7 +2,7 @@
 
 Requires osm2pgsql v1.5.0 or newer
 """
-from webapp import config
+from osm2pgsql_tuner import config
 
 
 class recommendation(object):

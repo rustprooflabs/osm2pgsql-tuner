@@ -1,4 +1,4 @@
-from webapp import app
+from osm2pgsql_tuner import app
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

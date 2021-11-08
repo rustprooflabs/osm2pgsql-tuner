@@ -1,6 +1,6 @@
 import logging
 from flask import Flask
-from webapp import config
+from osm2pgsql_tuner import config
 
 # App settings
 app = Flask(__name__)
@@ -18,4 +18,4 @@ logging.basicConfig(filename=config.LOG_PATH,
                     format=f'%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s')
 
 
-from webapp import routes
+from osm2pgsql_tuner import routes

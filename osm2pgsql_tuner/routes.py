@@ -2,7 +2,7 @@
 """
 import logging
 from flask import render_template, abort, request, redirect, jsonify
-from webapp import app, forms, osm2pgsql, config
+from osm2pgsql_tuner import app, forms, osm2pgsql, config
 
 api_uri = '/api/v1'
 

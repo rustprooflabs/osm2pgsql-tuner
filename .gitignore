@@ -1,6 +1,9 @@
-webapp/__pycache__/
+osm2pgsql_tuner/__pycache__/
 pytest.xml
 tests/__pycache__/
 docs/_build/
 .coverage
 *.log
+/*.egg-info
+build/
+dist/
