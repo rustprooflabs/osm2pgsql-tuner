@@ -49,5 +49,3 @@ Geofabrik's download server on 5/15/2021.
 
 Planet PBF size from https://planet.openstreetmap.org/pbf/ on 7/21/2021.
 """
-
-FLAT_NODES_THRESHOLD_GB = 8.0

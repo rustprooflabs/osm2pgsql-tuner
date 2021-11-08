@@ -2,8 +2,14 @@
 
 Requires osm2pgsql v1.5.0 or newer
 """
-from webapp import config
 
+
+FLAT_NODES_THRESHOLD_GB = 8.0
+"""Sets threshold size for when to use --flat-nodes.
+
+8-10 GB appears to be the threshold found prior to osm2pgsql v1.5.0.
+Proper testing has not been done yet to prove this is the best threshold yet.
+"""
 
 class recommendation(object):
 
@@ -76,7 +82,7 @@ class recommendation(object):
                         'desc': 'No reason to consider --flat-nodes'}
             self.decisions.append(decision)
             return False
-        elif self.osm_pbf_gb >= config.FLAT_NODES_THRESHOLD_GB and self.ssd:
+        elif self.osm_pbf_gb >= FLAT_NODES_THRESHOLD_GB and self.ssd:
             decision = {'option': '--flat-node',
                         'name': 'File of sufficient size',
                         'desc': 'File is large enough to consider --flat-nodes'}
