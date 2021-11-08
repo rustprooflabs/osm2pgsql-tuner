@@ -2,7 +2,10 @@
 """
 import logging
 from flask import render_template, abort, request, redirect, jsonify
-from osm2pgsql_tuner import app, forms, osm2pgsql, config
+from webapp import app, forms, config
+
+# Using 
+import osm2pgsql_tuner as tuner
 
 api_uri = '/api/v1'
 
@@ -62,10 +65,10 @@ def _get_api_params():
 def _get_recommendation(out_format):
     api_params = _get_api_params()
 
-    rec = osm2pgsql.recommendation(system_ram_gb=api_params['system_ram_gb'],
-                                   osm_pbf_gb=api_params['osm_pbf_gb'],
-                                   append=api_params['append'],
-                                   pgosm_layer_set=api_params['pgosm_layer_set'])
+    rec = tuner.recommendation(system_ram_gb=api_params['system_ram_gb'],
+                               osm_pbf_gb=api_params['osm_pbf_gb'],
+                               append=api_params['append'],
+                               pgosm_layer_set=api_params['pgosm_layer_set'])
     cmd = rec.get_osm2pgsql_command(out_format=out_format,
                                     pbf_filename=api_params['pbf_filename'])
     rec_data = {'cmd': cmd, 'decisions': rec.decisions,

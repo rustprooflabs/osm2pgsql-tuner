@@ -1,4 +1,5 @@
 osm2pgsql_tuner/__pycache__/
+webapp/__pycache__/
 pytest.xml
 tests/__pycache__/
 docs/_build/
