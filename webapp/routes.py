@@ -61,6 +61,7 @@ def _get_api_params():
 
     return api_params
 
+
 def _get_recommendation(out_format):
     api_params = _get_api_params()
 
@@ -82,6 +83,7 @@ def _get_recommendation(out_format):
                 'osm2pgsql_append': rec.append}
 
     return rec_data
+
 
 @app.route('/recommendation')
 def view_recommendation():
