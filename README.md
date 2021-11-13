@@ -115,7 +115,7 @@ coverage run -m unittest tests/*.py
 Generate report.
 
 ```bash
-coverage report -m webapp/*.py
+coverage report -m osm2pgsql_tuner/*.py webapp/*.py
 ```
 
 
