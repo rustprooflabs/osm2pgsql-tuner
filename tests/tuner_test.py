@@ -148,10 +148,11 @@ class Osm2pgsqlTests(unittest.TestCase):
         expected = 675
         self.assertEqual(expected, result)
 
+
     def test_osm2pgsql_recommendation_osm2pgsql_calculate_max_osm2pgsql_cache_works_with_float(self):
         value_specific = float(SYSTEM_RAM_GB_SMALL)
         rec = tuner.recommendation(value_specific, OSM_PBF_GB_USWEST)
-        actual = rec._calculate_max_osm2pgsql_cache()
+        actual = rec.calculate_max_osm2pgsql_cache()
         expected = 0.66
         self.assertEqual(expected, actual)
 
@@ -159,7 +160,7 @@ class Osm2pgsqlTests(unittest.TestCase):
     def test_osm2pgsql_recommendation_osm2pgsql_calculate_max_osm2pgsql_cache_works_with_integer(self):
         value_specific = int(SYSTEM_RAM_GB_SMALL)
         rec = tuner.recommendation(value_specific, OSM_PBF_GB_USWEST)
-        actual = rec._calculate_max_osm2pgsql_cache()
+        actual = rec.calculate_max_osm2pgsql_cache()
         expected = 0.66
         self.assertEqual(expected, actual)
 
