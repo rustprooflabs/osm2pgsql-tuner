@@ -1,3 +1,5 @@
+"""Configuration for osm2pgsql-tuner webapp.
+"""
 import os
 
 

@@ -21,11 +21,10 @@ def view_root_path():
         osm_pbf_gb = osm_pbf_details['size_gb']
         pbf_filename = osm_pbf_details['filename']
         append = form.append.data
-        url_params = f'system_ram_gb={system_ram_gb}'
-        url_params += f'&osm_pbf_gb={osm_pbf_gb}'
-        url_params += f'&append={append}'
-        url_params += f'&pbf_filename={pbf_filename}'
-        url_params += f'&pgosm_layer_set=run-all'
+        url_params = build_url_params(system_ram_gb,
+                                      osm_pbf_gb,
+                                      append,
+                                      pbf_filename)
         return redirect(f'/recommendation?{url_params}')
 
     return render_template('index.html', form=form)
@@ -62,6 +61,7 @@ def _get_api_params():
 
     return api_params
 
+
 def _get_recommendation(out_format):
     api_params = _get_api_params()
 
@@ -84,11 +84,19 @@ def _get_recommendation(out_format):
 
     return rec_data
 
+
 @app.route('/recommendation')
 def view_recommendation():
     rec_data = _get_recommendation(out_format='html')
     params = request.args
-    return render_template('recommendation.html', rec_data=rec_data)
+    url_params = build_url_params(params['system_ram_gb'],
+                                  params['osm_pbf_gb'],
+                                  params['append'],
+                                  params['pbf_filename'])
+    api_url = f'{api_uri}?{url_params}'
+    return render_template('recommendation.html',
+                           rec_data=rec_data,
+                           api_url=api_url)
 
 
 @app.route(api_uri)
@@ -100,4 +108,26 @@ def view_recommendation_api():
 @app.route('/about')
 def view_about():
     return render_template('about.html')
+
+
+def build_url_params(system_ram_gb, osm_pbf_gb, append, pbf_filename):
+    """Creates the URL parameter string from individual components.
+
+    Parameters
+    ------------------------
+    system_ram_gb : float
+    osm_pbf_gb : float
+    append : bool
+    pbf_filename : str
+
+    Returns
+    ------------------------
+    url_params : str
+    """
+    url_params = f'system_ram_gb={system_ram_gb}'
+    url_params += f'&osm_pbf_gb={osm_pbf_gb}'
+    url_params += f'&append={append}'
+    url_params += f'&pbf_filename={pbf_filename}'
+    url_params += f'&pgosm_layer_set=run'
+    return url_params
 
