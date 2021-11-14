@@ -39,12 +39,12 @@ class recommendation(object):
         self.decisions = list()
 
         # Calculated attributes
-        self.osm2pgsql_cache_max = self._calculate_max_osm2pgsql_cache()
-        self.osm2pgsql_noslim_cache = self._calculate_osm2pgsql_noslim_cache()
+        self.osm2pgsql_cache_max = self.calculate_max_osm2pgsql_cache()
+        self.osm2pgsql_noslim_cache = self.calculate_osm2pgsql_noslim_cache()
         # No real method to this calculation, initial gut instinct
         self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache
 
-        self.osm2pgsql_run_in_ram = self._run_in_ram()
+        self.osm2pgsql_run_in_ram = self.run_in_ram()
         self.osm2pgsql_drop = self.use_drop()
         self.osm2pgsql_flat_nodes = self.use_flat_nodes()
 
@@ -52,7 +52,11 @@ class recommendation(object):
 
 
     def limited_ram_check(self):
-        """Indicates if osm2pgsql could use more RAM than the system has available.
+        """Decide if osm2pgsql can use more RAM than the system has available.
+
+        Returns
+        -------------------------
+        limited_ram : boolean
         """
         if self.osm2pgsql_run_in_ram:
             # If running w/out slim is possible, already determined there is
@@ -61,6 +65,8 @@ class recommendation(object):
         elif self.osm2pgsql_slim_cache > self.osm2pgsql_cache_max:
             return True
 
+        # Is this possible to reach? Does self.osm2pgsql_run_in_ram provide
+        # enough info already?
         return False
 
     def use_flat_nodes(self):
@@ -131,7 +137,7 @@ class recommendation(object):
         return use_drop
 
 
-    def _calculate_max_osm2pgsql_cache(self):
+    def calculate_max_osm2pgsql_cache(self):
         """Calculates the max RAM server has available to dedicate to osm2pgsql cache.
 
         Using 2/3 total as a starting point
@@ -143,8 +149,9 @@ class recommendation(object):
         osm2pgsql_cache_max = self.system_ram_gb * 0.66
         return osm2pgsql_cache_max
 
-    def _calculate_osm2pgsql_noslim_cache(self):
-        """
+    def calculate_osm2pgsql_noslim_cache(self):
+        """Calculates cache required by osm2pgsql in order to run w/out slim.
+
         https://blog.rustprooflabs.com/2021/05/osm2pgsql-reduced-ram-load-to-postgis
 
         Returns
@@ -155,7 +162,8 @@ class recommendation(object):
         required_gb = 1 + (2.5 * self.osm_pbf_gb)
         return required_gb
 
-    def _run_in_ram(self):
+
+    def run_in_ram(self):
         """Determines if bypassing --slim is an option with the given details.
 
         Returns
@@ -172,6 +180,18 @@ class recommendation(object):
 
 
     def get_osm2pgsql_command(self, out_format, pbf_filename):
+        """Builds the recommended osm2pgsql command.
+
+        Parameters
+        -----------------------
+        out_format : str
+            Either `api` or `html`.
+        pbf_filename : str
+
+        Returns
+        -----------------------
+        cmd : str
+        """
         cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
 
         if self.osm2pgsql_run_in_ram:

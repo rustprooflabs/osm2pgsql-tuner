@@ -55,10 +55,10 @@ Import `osm2pgsql_tuner` and create an instance of the `recommendation` class.
 ```python
 import osm2pgsql_tuner
 rec = osm2pgsql_tuner.recommendation(system_ram_gb=8,
-									 osm_pbf_gb=0.5,
-									 pgosm_layer_set='run')
+                                     osm_pbf_gb=0.5,
+                                     pgosm_layer_set='run')
 osm2pgsql_command = rec.get_osm2pgsql_command(out_format='api',
-											  pbf_filename='example_file')
+                                              pbf_filename='example_file')
 print(osm2pgsql_command)
 ```
 
@@ -115,14 +115,16 @@ coverage run -m unittest tests/*.py
 Generate report.
 
 ```bash
-coverage report -m webapp/*.py
+coverage report -m osm2pgsql_tuner/*.py webapp/*.py
 ```
 
 
 Run pylint.
 
 ```bash
-pylint --rcfile=./.pylintrc -f parseable ./webapp/*.py
+pylint --rcfile=./.pylintrc -f parseable \
+    ./webapp/*.py \
+    ./osm2pgsql_tuner/*.py
 ```
 
 
