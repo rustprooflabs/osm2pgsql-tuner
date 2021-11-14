@@ -14,7 +14,7 @@ Proper testing has not been done yet to prove this is the best threshold yet.
 class recommendation(object):
 
     def __init__(self, system_ram_gb, osm_pbf_gb, append=False,
-                 pgosm_layer_set='run-all', ssd=True):
+                 pgosm_layer_set='run', ssd=True):
         """osm2pgsql.recommendation class takes basic inputs to generate
         command suggestions for osm2pgsql.
 
