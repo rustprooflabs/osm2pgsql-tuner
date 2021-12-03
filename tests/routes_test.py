@@ -25,6 +25,6 @@ class RoutesTests(unittest.TestCase):
                                          osm_pbf_gb=OSM_PBF_GB_US,
                                          append=False,
                                          pbf_filename='not-important')
-        expected = 'system_ram_gb=1&osm_pbf_gb=10.4&append=False&pbf_filename=not-important&pgosm_layer_set=run'
+        expected = 'system_ram_gb=2&osm_pbf_gb=10.4&append=False&pbf_filename=not-important&pgosm_layer_set=run'
         self.assertEqual(expected, actual)
 
