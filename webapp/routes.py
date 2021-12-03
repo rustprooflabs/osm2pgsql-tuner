@@ -1,7 +1,7 @@
 """osm2pgsq-tuner webapp routes.
 """
 import logging
-from flask import render_template, abort, request, redirect, jsonify
+from flask import render_template, abort, request, redirect, jsonify, flash
 from webapp import app, forms, config
 
 # Using 
@@ -65,10 +65,20 @@ def _get_api_params():
 def _get_recommendation(out_format):
     api_params = _get_api_params()
 
-    rec = tuner.recommendation(system_ram_gb=api_params['system_ram_gb'],
-                               osm_pbf_gb=api_params['osm_pbf_gb'],
-                               append=api_params['append'],
-                               pgosm_layer_set=api_params['pgosm_layer_set'])
+    try:
+        rec = tuner.recommendation(system_ram_gb=api_params['system_ram_gb'],
+                                   osm_pbf_gb=api_params['osm_pbf_gb'],
+                                   append=api_params['append'],
+                                   pgosm_layer_set=api_params['pgosm_layer_set'])
+    except ValueError as err:
+        err_msg = str(err)
+        if 'osm2pgsql' in err_msg:
+            if out_format == 'html':
+                flash(err_msg, 'danger')
+                return redirect('/')
+            else:
+                return abort(400, err_msg)
+
     cmd = rec.get_osm2pgsql_command(out_format=out_format,
                                     pbf_filename=api_params['pbf_filename'])
     rec_data = {'cmd': cmd, 'decisions': rec.decisions,
@@ -102,7 +112,7 @@ def view_recommendation():
 @app.route(api_uri)
 def view_recommendation_api():
     rec_data = _get_recommendation(out_format='api')
-    return jsonify(osm2pgsql= rec_data)
+    return jsonify(osm2pgsql=rec_data)
 
 
 @app.route('/about')
