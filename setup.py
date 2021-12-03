@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='osm2pgsql_tuner',
-      version='0.0.3',
+      version='0.0.4-dev',
       description='osm2pgsql tuner',
       url='https://github.com/rustprooflabs/osm2pgsql-tuner',
       author='RustProof Labs',
