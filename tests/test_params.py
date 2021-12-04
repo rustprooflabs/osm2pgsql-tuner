@@ -1,7 +1,8 @@
 """Common values used for testing.
 """
 SYSTEM_RAM_GB_MAIN = 64
-SYSTEM_RAM_GB_SMALL = 1
+SYSTEM_RAM_GB_SMALL = 2
+SYSTEM_RAM_GB_TOO_SMALL = 1
 OSM_PBF_GB_US = 10.4
 
 OSM_PBF_GB_CO = 0.2

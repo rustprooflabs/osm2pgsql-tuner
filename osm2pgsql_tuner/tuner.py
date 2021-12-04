@@ -30,6 +30,9 @@ class recommendation(object):
             (Default False) If append mode is needed, --slim must be used.
         """
         # Set from params
+        if system_ram_gb < 2.0:
+            raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
+
         self.system_ram_gb = system_ram_gb
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
