@@ -175,6 +175,10 @@ class recommendation(object):
         """
         if self.append:
             in_ram_possible = False
+            decision = {'option': '--slim',
+                        'name': 'Using Append',
+                        'desc': 'Use of --append mode requires --slim'}
+            self.decisions.append(decision)
         elif self.osm2pgsql_noslim_cache <= self.osm2pgsql_cache_max:
             in_ram_possible = True
         else:
