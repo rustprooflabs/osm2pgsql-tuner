@@ -4,10 +4,9 @@ import logging
 from flask import render_template, abort, request, redirect, jsonify, flash
 from webapp import app, forms, config
 
-# Using 
 import osm2pgsql_tuner as tuner
 
-api_uri = '/api/v1'
+API_URI = '/api/v1'
 
 @app.route('/', methods=['GET', 'POST'])
 def view_root_path():
@@ -76,8 +75,8 @@ def _get_recommendation(out_format):
             if out_format == 'html':
                 flash(err_msg, 'danger')
                 return redirect('/')
-            else:
-                return abort(400, err_msg)
+
+            return abort(400, err_msg)
 
     cmd = rec.get_osm2pgsql_command(out_format=out_format,
                                     pbf_filename=api_params['pbf_filename'])
@@ -98,18 +97,24 @@ def _get_recommendation(out_format):
 @app.route('/recommendation')
 def view_recommendation():
     rec_data = _get_recommendation(out_format='html')
+
+    # Happens on Error from recommendation engine
+    if not isinstance(rec_data, dict):
+        # Should already be valid response
+        return rec_data
+
     params = request.args
     url_params = build_url_params(params['system_ram_gb'],
                                   params['osm_pbf_gb'],
                                   params['append'],
                                   params['pbf_filename'])
-    api_url = f'{api_uri}?{url_params}'
+    api_url = f'{API_URI}?{url_params}'
     return render_template('recommendation.html',
                            rec_data=rec_data,
                            api_url=api_url)
 
 
-@app.route(api_uri)
+@app.route(API_URI)
 def view_recommendation_api():
     rec_data = _get_recommendation(out_format='api')
     return jsonify(osm2pgsql=rec_data)
@@ -140,4 +145,3 @@ def build_url_params(system_ram_gb, osm_pbf_gb, append, pbf_filename):
     url_params += f'&pbf_filename={pbf_filename}'
     url_params += f'&pgosm_layer_set=run'
     return url_params
-
