@@ -1,6 +1,22 @@
 # osm2pgsql-tuner
 
+The osm2pgsql-tuner project recommends an osm2pgsql command based on
+available system resources and the size of the input PBF file.
+The recommendations made by this program are targeted for:
+
+* osm2pgsql v1.5.0 and newer
+* Flex output
+* No stage 2 processing
+
+Stage 2 processing has less predictable RAM consumption
+[per this discussion on GitHub](https://github.com/openstreetmap/osm2pgsql/discussions/1536).
+
+
+
 ## Using the API
+
+This project is hosted as a free API at https://osm2pgsql-tuner.com by RustProof Labs.
+The following is an example of using this API from Python.
 
 ```python
 import requests
@@ -14,7 +30,7 @@ api_endpoint = 'https://osm2pgsql-tuner.com/api/v1'
 api_endpoint += f'?system_ram_gb={system_ram_gb}&osm_pbf_gb={osm_pbf_gb}&append={append}&pbf_filename={pbf_filename}'
 ```
 
-Query the endpoint, check the status
+Query the endpoint, check the status.
 
 ```python
 result = requests.get(api_endpoint)
@@ -27,7 +43,7 @@ Get recommendation data.
 rec = result.json()['osm2pgsql']
 ```
 
-Command is the most interesting part
+Command is the most interesting part.
 
 ```python
 print(f"\nCommand:\n{rec['cmd']} ")
@@ -72,7 +88,7 @@ osm2pgsql -d $PGOSM_CONN  --output=flex --style=./run.lua  ~/pgosm-data/example_
 ## Deployment Instructions
 
 > Note:  Need to update the sub-version of Python over time.  Can use simply
-`python3` but that can lead to using older unsupported versions based on distro-defaults.
+`python3` but that can lead to using older unsupported versions based on distribution defaults.
 
 
 ```bash
@@ -127,5 +143,7 @@ pylint --rcfile=./.pylintrc -f parseable \
     ./osm2pgsql_tuner/*.py
 ```
 
+## Used by
 
-
+This project is used by [PgOSM Flex](https://github.com/rustprooflabs/pgosm-flex)
+to automate commands in the [PgOSM Flex Docker image](https://hub.docker.com/r/rustprooflabs/pgosm-flex).

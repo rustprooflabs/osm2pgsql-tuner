@@ -73,6 +73,10 @@ class Osm2pgsqlTests(unittest.TestCase):
         expected = 20736
         self.assertEqual(expected, result)
 
+    def test_osm2pgsql_recommendation_value_error_when_insufficient_ram(self):
+        with self.assertRaises(ValueError):
+            tuner.recommendation(SYSTEM_RAM_GB_TOO_SMALL, OSM_PBF_GB_CO)
+
 
     def test_osm2pgsql_recommendation_osm2pgsql_drop_value_false(self):
         rec = tuner.recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US)
@@ -140,7 +144,7 @@ class Osm2pgsqlTests(unittest.TestCase):
     def test_osm2pgsql_recommendation_osm2pgsql_cache_mb_value_limited_ram_version(self):
         rec = tuner.recommendation(SYSTEM_RAM_GB_SMALL, OSM_PBF_GB_USWEST)
         result = rec.get_cache_mb()
-        expected = 675
+        expected = 1351
         self.assertEqual(expected, result)
 
 
@@ -148,7 +152,7 @@ class Osm2pgsqlTests(unittest.TestCase):
         value_specific = float(SYSTEM_RAM_GB_SMALL)
         rec = tuner.recommendation(value_specific, OSM_PBF_GB_USWEST)
         actual = rec.calculate_max_osm2pgsql_cache()
-        expected = 0.66
+        expected = 1.32
         self.assertEqual(expected, actual)
 
 
@@ -156,6 +160,6 @@ class Osm2pgsqlTests(unittest.TestCase):
         value_specific = int(SYSTEM_RAM_GB_SMALL)
         rec = tuner.recommendation(value_specific, OSM_PBF_GB_USWEST)
         actual = rec.calculate_max_osm2pgsql_cache()
-        expected = 0.66
+        expected = 1.32
         self.assertEqual(expected, actual)
 

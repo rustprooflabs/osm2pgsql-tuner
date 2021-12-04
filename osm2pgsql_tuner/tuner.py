@@ -30,6 +30,9 @@ class recommendation(object):
             (Default False) If append mode is needed, --slim must be used.
         """
         # Set from params
+        if system_ram_gb < 2.0:
+            raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
+
         self.system_ram_gb = system_ram_gb
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
@@ -172,6 +175,10 @@ class recommendation(object):
         """
         if self.append:
             in_ram_possible = False
+            decision = {'option': '--slim',
+                        'name': 'Using Append',
+                        'desc': 'Use of --append mode requires --slim'}
+            self.decisions.append(decision)
         elif self.osm2pgsql_noslim_cache <= self.osm2pgsql_cache_max:
             in_ram_possible = True
         else:

@@ -13,6 +13,19 @@
                     {% include '_page_header.html' %}
                 </div>
 
+                <div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                       {% if messages %}
+                          {% for category, message in messages %}
+                              <div class="row alert alert-{{ category }} text-center">
+                                 {{ message }}
+                             </div>
+                          {% endfor %}
+                       {% endif %}
+                    {% endwith %}
+
+                </div>
+
                 <div class="main_content">
                     {% block main_content %}
                         Main content will go here...
