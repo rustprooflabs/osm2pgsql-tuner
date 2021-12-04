@@ -1,7 +1,7 @@
 # osm2pgsql-tuner
 
 The osm2pgsql-tuner project recommends an osm2pgsql command based on
-availalbe system resources and the size of the input PBF file.
+available system resources and the size of the input PBF file.
 The recommendations made by this program are targeted for:
 
 * osm2pgsql v1.5.0 and newer
@@ -88,7 +88,7 @@ osm2pgsql -d $PGOSM_CONN  --output=flex --style=./run.lua  ~/pgosm-data/example_
 ## Deployment Instructions
 
 > Note:  Need to update the sub-version of Python over time.  Can use simply
-`python3` but that can lead to using older unsupported versions based on distro-defaults.
+`python3` but that can lead to using older unsupported versions based on distribution defaults.
 
 
 ```bash
