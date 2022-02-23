@@ -252,12 +252,3 @@ class recommendation(object):
 
         self.decisions.append(decision)
         return cache
-
-
-    def _get_postgres_conf_suggestion(self):
-        shared_buffers_gb = 1
-        work_mem_mb = 50
-
-        postgres_conf = {'shared_buffers': f'{shared_buffers_gb} GB',
-                         'work_mem': f'{work_mem_mb} MB'}
-        return postgres_conf
