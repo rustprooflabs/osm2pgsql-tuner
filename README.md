@@ -73,8 +73,9 @@ import osm2pgsql_tuner
 rec = osm2pgsql_tuner.recommendation(system_ram_gb=8,
                                      osm_pbf_gb=0.5,
                                      pgosm_layer_set='run')
+pbf_path = '~/pgosm-data/example_file.osm.pbf'
 osm2pgsql_command = rec.get_osm2pgsql_command(out_format='api',
-                                              pbf_filename='example_file')
+                                              pbf_path=pbf_path)
 print(osm2pgsql_command)
 ```
 
