@@ -1,6 +1,6 @@
 """Contains osm2pgsql class to help provide osm2pgsql tuning advice.
 
-Requires osm2pgsql v1.5.0 or newer
+Recommendations require osm2pgsql v1.5.0 or newer
 """
 
 
@@ -186,14 +186,14 @@ class recommendation(object):
         return in_ram_possible
 
 
-    def get_osm2pgsql_command(self, out_format, pbf_filename):
+    def get_osm2pgsql_command(self, out_format, pbf_path):
         """Builds the recommended osm2pgsql command.
 
         Parameters
         -----------------------
         out_format : str
             Either `api` or `html`.
-        pbf_filename : str
+        pbf_path : str
 
         Returns
         -----------------------
@@ -213,7 +213,7 @@ class recommendation(object):
                 cmd += ' --flat-nodes=/tmp/nodes \ \n'
 
         cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
-        cmd += f' ~/pgosm-data/{pbf_filename}.osm.pbf'
+        cmd += f' {pbf_path}'
 
         if out_format == 'api':
             cmd = cmd.replace('\ \n', '')
