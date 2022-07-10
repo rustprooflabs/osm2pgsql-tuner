@@ -213,10 +213,7 @@ class recommendation(object):
         """
         cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
 
-        if self.osm2pgsql_run_in_ram:
-            # Nothing to do here
-            pass
-        else:
+        if not self.osm2pgsql_run_in_ram:
             cache = self.get_cache_mb()
             cmd += f' --cache={cache} \ \n'
             cmd += ' --slim \ \n'
@@ -233,7 +230,7 @@ class recommendation(object):
             # Remove line breaks for API format
             cmd = cmd.replace('\ \n', '')
         elif out_format == 'html':
-            # Add HTML line breaks for HTM version
+            # Add HTML line breaks for HTML version
             cmd = cmd.replace('\n', '<br />')
         else:
             raise ValueError(f'Invalid out_format: {out_format}. Valid values are "api" and "html"')

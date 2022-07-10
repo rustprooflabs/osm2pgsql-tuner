@@ -177,3 +177,9 @@ class Osm2pgsqlTests(unittest.TestCase):
         result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --output=flex --style=./run.lua  {pbf_path}'
         self.assertEqual(expected, result)
+
+    def test_osm2pgsql_recommendation_osm2pgsql_get_osm2pgsql_command_error_invalid_type(self):
+        rec = tuner.recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US)
+        pbf_path = 'blahblah'
+        self.assertRaises(ValueError, rec.get_osm2pgsql_command, 'invalid', pbf_path)
+
