@@ -32,17 +32,24 @@ class recommendation(object):
     ssd : bool
         (Default True) Is the osm2pgsql server using SSD for storage? Value determines threshold
         for decision to use `--flat-nodes`
-    """
 
+    append_first_run : bool or None
+        (Default None) If `append` is True, `append_first_run` must be set.
+        Used to determine if `--create` or `--append` is passed to osm2pgsql.
+    """
     def __init__(self, system_ram_gb, osm_pbf_gb, append=False,
-                 pgosm_layer_set='run', ssd=True):
+                 pgosm_layer_set='run', ssd=True, append_first_run=None):
         """Bootstrap the class"""
         if system_ram_gb < 2.0:
             raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
 
+        if append and append_first_run is None:
+            raise ValueError('append_first_run must be set when append is true.')
+
         self.system_ram_gb = system_ram_gb
         self.osm_pbf_gb = osm_pbf_gb
         self.append = append
+        self.append_first_run = append_first_run
         self.pgosm_layer_set = pgosm_layer_set
         self.ssd = ssd
 
@@ -222,6 +229,15 @@ class recommendation(object):
             if self.osm2pgsql_flat_nodes:
                 nodes_path = '/tmp/nodes'
                 cmd += f' --flat-nodes={nodes_path} \ \n'
+
+        # Create is default, being extra verbose and always adding it now
+        osm2pgsql_mode = ' --create '
+
+        # Support for getting command for subsequent imports in append mode
+        if self.append and not self.append_first_run:
+            osm2pgsql_mode = ' --append '
+
+        cmd += osm2pgsql_mode
 
         cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
         cmd += f' {pbf_path}'
