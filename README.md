@@ -148,3 +148,13 @@ pylint --rcfile=./.pylintrc -f parseable \
 
 This project is used by [PgOSM Flex](https://github.com/rustprooflabs/pgosm-flex)
 to automate commands in the [PgOSM Flex Docker image](https://hub.docker.com/r/rustprooflabs/pgosm-flex).
+
+
+## Development install
+
+
+```
+pip install -e .
+```
+
+

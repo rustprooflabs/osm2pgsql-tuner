@@ -30,6 +30,7 @@ class Osm2pgsqlTunerInput(FlaskForm):
     osm_pbf = SelectField('OSM PBF size (GB)',
                           default='North America',
                           choices=pbf_gb_choices)
-    append = BooleanField('Use Append?', default=False)
+    append = SelectField('Use Append?', default='No',
+                         choices=['No', 'Yes, 1st import', 'Yes, 2nd or later'])
     ssd = SelectField('Using SSD?', default='Yes, SSD',
                        choices=['Yes, SSD'])
