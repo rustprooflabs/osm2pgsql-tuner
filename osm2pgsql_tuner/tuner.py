@@ -21,8 +21,12 @@ class recommendation(object):
     osm_pbf_gb : float
         Size of the `.osm.pbf` file in GB.
 
-    append : bool
-        (Default False) If append mode is needed, --slim must be used.
+    slim_no_drop : bool
+        (Default False) Setup to use osm2pgsql --append. When true --slim must be used.
+
+    append_first_run : bool or None
+        (Default None) If `slim_no_drop` is True, `append_first_run` must be set.
+        Used to determine if `--create` or `--append` is passed to osm2pgsql.
 
     pgosm_layer_set : str
         (Default (run) Base name of `.lua` script to run.
@@ -32,23 +36,19 @@ class recommendation(object):
     ssd : bool
         (Default True) Is the osm2pgsql server using SSD for storage? Value determines threshold
         for decision to use `--flat-nodes`
-
-    append_first_run : bool or None
-        (Default None) If `append` is True, `append_first_run` must be set.
-        Used to determine if `--create` or `--append` is passed to osm2pgsql.
     """
-    def __init__(self, system_ram_gb, osm_pbf_gb, append=False,
-                 pgosm_layer_set='run', ssd=True, append_first_run=None):
+    def __init__(self, system_ram_gb, osm_pbf_gb, slim_no_drop=False,
+                 append_first_run=None, pgosm_layer_set='run', ssd=True):
         """Bootstrap the class"""
         if system_ram_gb < 2.0:
             raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
 
-        if append and append_first_run is None:
-            raise ValueError('append_first_run must be set when append is true.')
+        if slim_no_drop and append_first_run is None:
+            raise ValueError('append_first_run must be set when slim_no_drop is true.')
 
         self.system_ram_gb = system_ram_gb
         self.osm_pbf_gb = osm_pbf_gb
-        self.append = append
+        self.slim_no_drop = slim_no_drop
         self.append_first_run = append_first_run
         self.pgosm_layer_set = pgosm_layer_set
         self.ssd = ssd
@@ -138,7 +138,7 @@ class recommendation(object):
                         'name': 'Sufficient RAM',
                         'desc': 'Import can run entirely in RAM, --drop not needed.'}
             self.decisions.append(decision)
-        elif self.append:
+        elif self.slim_no_drop:
             use_drop = False
             decision = {'option': '--drop',
                         'name': 'Using Append',
@@ -192,7 +192,7 @@ class recommendation(object):
         --------------------
         in_ram_possible : bool
         """
-        if self.append:
+        if self.slim_no_drop:
             in_ram_possible = False
             decision = {'option': '--slim',
                         'name': 'Using Append',
@@ -234,7 +234,7 @@ class recommendation(object):
         osm2pgsql_mode = ' --create '
 
         # Support for getting command for subsequent imports in append mode
-        if self.append and not self.append_first_run:
+        if self.slim_no_drop and not self.append_first_run:
             osm2pgsql_mode = ' --append '
 
         cmd += osm2pgsql_mode

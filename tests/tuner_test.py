@@ -84,26 +84,26 @@ class Osm2pgsqlTests(unittest.TestCase):
         expected = False
         self.assertEqual(expected, result)
 
-    def test_osm2pgsql_recommendation_osm2pgsql_append_with_additional_param_raises_ValueError(self):
+    def test_osm2pgsql_recommendation_osm2pgsql_slim_no_drop_with_additional_param_raises_ValueError(self):
         with self.assertRaises(ValueError):
             tuner.recommendation(system_ram_gb=OSM_PBF_GB_US,
                                  osm_pbf_gb=OSM_PBF_GB_US,
-                                 append=True)
+                                 slim_no_drop=True)
 
-    def test_osm2pgsql_recommendation_osm2pgsql_drop_value_false_with_append(self):
+    def test_osm2pgsql_recommendation_osm2pgsql_drop_value_false_with_slim_no_drop(self):
         # NOTE: Setting system ram == PBF size to ensure slim is used
         rec = tuner.recommendation(system_ram_gb=OSM_PBF_GB_US,
                                        osm_pbf_gb=OSM_PBF_GB_US,
-                                       append=True, append_first_run=True)
+                                       slim_no_drop=True, append_first_run=True)
         result = rec.osm2pgsql_drop
         expected = False
         self.assertEqual(expected, result)
 
-    def test_osm2pgsql_recommendation_osm2pgsql_drop_value_true_without_append(self):
+    def test_osm2pgsql_recommendation_osm2pgsql_drop_value_true_without_slim_no_drop(self):
         # NOTE: Setting system ram == PBF size to ensure slim is used
         rec = tuner.recommendation(system_ram_gb=OSM_PBF_GB_US,
                                        osm_pbf_gb=OSM_PBF_GB_US,
-                                       append=False)
+                                       slim_no_drop=False)
         result = rec.osm2pgsql_drop
         expected = True
         self.assertEqual(expected, result)
@@ -190,20 +190,22 @@ class Osm2pgsqlTests(unittest.TestCase):
         self.assertRaises(ValueError, rec.get_osm2pgsql_command, 'invalid', pbf_path)
 
     def test_osm2pgsql_recommendation_osm2pgsql_command_append_first_run_correct_cmd(self):
-        append = True
+        slim_no_drop = True
         append_first_run = True
         rec = tuner.recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US,
-                                   append=append, append_first_run=append_first_run)
+                                   slim_no_drop=slim_no_drop,
+                                   append_first_run=append_first_run)
         pbf_path = 'blahblah'
         result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --flat-nodes=/tmp/nodes  --create  --output=flex --style=./run.lua  {pbf_path}'
         self.assertEqual(expected, result)
 
     def test_osm2pgsql_recommendation_osm2pgsql_command_append_subsequent_run_correct_cmd(self):
-        append = True
+        slim_no_drop = True
         append_first_run = False
         rec = tuner.recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US,
-                                   append=append, append_first_run=append_first_run)
+                                   slim_no_drop=slim_no_drop,
+                                   append_first_run=append_first_run)
         pbf_path = 'blahblah'
         result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --flat-nodes=/tmp/nodes  --append  --output=flex --style=./run.lua  {pbf_path}'
