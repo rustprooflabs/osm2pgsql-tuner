@@ -1,12 +1,24 @@
 """osm2pgsq-tuner webapp routes.
 """
+import pkg_resources
 import logging
-from flask import render_template, abort, request, redirect, jsonify, flash
+from flask import render_template, abort, g, request, redirect, jsonify, flash
 from webapp import app, forms, config
 
 import osm2pgsql_tuner as tuner
 
 API_URI = '/api/v1'
+
+TUNER_VERSION = pkg_resources.require("osm2pgsql_tuner")[0].version
+
+
+@app.before_request
+def before_request():
+    """ This method is triggered before every request to ensure the g.* attributes
+    are populated
+    """
+    g.tuner_version = TUNER_VERSION
+
 
 @app.route('/', methods=['GET', 'POST'])
 def view_root_path():
@@ -42,10 +54,7 @@ def _get_api_params():
 
     append_raw = request.args.get('append')
 
-    if append_raw == 'True':
-        append = True
-    else:
-        append = False
+    append, append_first_run = decode_append_raw(append_raw)
 
     if request.args.get('pgosm_layer_set'):
         pgosm_layer_set = request.args.get('pgosm_layer_set')
@@ -55,10 +64,38 @@ def _get_api_params():
     api_params = {'system_ram_gb': system_ram_gb,
                   'osm_pbf_gb': osm_pbf_gb,
                   'append': append,
+                  'append_first_run': append_first_run,
                   'pbf_filename': pbf_filename,
                   'pgosm_layer_set': pgosm_layer_set}
 
     return api_params
+
+
+def decode_append_raw(append_raw):
+    """Converts the form's drop-down options into the appropriate values
+    to submit to osm2pgsql-tuner.
+
+    Parameters
+    ----------------------
+    append_raw : bool
+
+    Returns
+    ----------------------
+    append, append_first_run
+    """
+    if append_raw == 'No':
+        append = False
+    else:
+        append = True
+
+    append_first_run = None
+    if append:
+        if append_raw == 'Yes, 1st import':
+            append_first_run = True
+        else:
+            append_first_run = False
+
+    return append, append_first_run
 
 
 def _get_recommendation(out_format):
@@ -68,15 +105,15 @@ def _get_recommendation(out_format):
         rec = tuner.recommendation(system_ram_gb=api_params['system_ram_gb'],
                                    osm_pbf_gb=api_params['osm_pbf_gb'],
                                    append=api_params['append'],
+                                   append_first_run=api_params['append_first_run'],
                                    pgosm_layer_set=api_params['pgosm_layer_set'])
     except ValueError as err:
         err_msg = str(err)
-        if 'osm2pgsql' in err_msg:
-            if out_format == 'html':
-                flash(err_msg, 'danger')
-                return redirect('/')
+        if out_format == 'html':
+            flash(f'Error: {err_msg}', 'danger')
+            return redirect('/')
 
-            return abort(400, err_msg)
+        return abort(400, err_msg)
 
     pbf_filename = api_params['pbf_filename']
     pbf_path = f'~/pgosm-data/{pbf_filename}.osm.pbf'

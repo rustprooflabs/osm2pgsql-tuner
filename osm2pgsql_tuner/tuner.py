@@ -5,37 +5,51 @@ Recommendations require osm2pgsql v1.5.0 or newer
 
 
 FLAT_NODES_THRESHOLD_GB = 8.0
-"""Sets threshold size for when to use --flat-nodes.
+"""float : Sets threshold size for when to use --flat-nodes.
 
-8-10 GB appears to be the threshold found prior to osm2pgsql v1.5.0.
-Proper testing has not been done yet to prove this is the best threshold yet.
+8-10 GB appears to be an appropriate threshold when using modern SSDs for storage.
 """
 
 class recommendation(object):
+    """Takes basic inputs to generate command recommendations for osm2pgsql.
 
-    def __init__(self, system_ram_gb, osm_pbf_gb, append=False,
-                 pgosm_layer_set='run', ssd=True):
-        """osm2pgsql.recommendation class takes basic inputs to generate
-        command suggestions for osm2pgsql.
+    Parameters
+    -----------------------
+    system_ram_gb : float
+        How much total RAM the server has, in GB.
 
-        Parameters
-        -----------------------
-        system_ram_gb : float
-            How much total RAM the server has, in GB.
+    osm_pbf_gb : float
+        Size of the `.osm.pbf` file in GB.
 
-        osm_pbf_gb : float
-            Size of the .osm.pbf file in GB.
+    slim_no_drop : bool
+        (Default False) Setup to use osm2pgsql --append. When true --slim must be used.
 
-        append : bool
-            (Default False) If append mode is needed, --slim must be used.
-        """
-        # Set from params
+    append_first_run : bool or None
+        (Default None) If `slim_no_drop` is True, `append_first_run` must be set.
+        Used to determine if `--create` or `--append` is passed to osm2pgsql.
+
+    pgosm_layer_set : str
+        (Default (run) Base name of `.lua` script to run.
+
+        PgOSM Flex uses the `run` entry point.
+
+    ssd : bool
+        (Default True) Is the osm2pgsql server using SSD for storage? Value determines threshold
+        for decision to use `--flat-nodes`
+    """
+    def __init__(self, system_ram_gb, osm_pbf_gb, slim_no_drop=False,
+                 append_first_run=None, pgosm_layer_set='run', ssd=True):
+        """Bootstrap the class"""
         if system_ram_gb < 2.0:
             raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
 
+        if slim_no_drop and append_first_run is None:
+            raise ValueError('append_first_run must be set when slim_no_drop is true.')
+
         self.system_ram_gb = system_ram_gb
         self.osm_pbf_gb = osm_pbf_gb
-        self.append = append
+        self.slim_no_drop = slim_no_drop
+        self.append_first_run = append_first_run
         self.pgosm_layer_set = pgosm_layer_set
         self.ssd = ssd
 
@@ -124,7 +138,7 @@ class recommendation(object):
                         'name': 'Sufficient RAM',
                         'desc': 'Import can run entirely in RAM, --drop not needed.'}
             self.decisions.append(decision)
-        elif self.append:
+        elif self.slim_no_drop:
             use_drop = False
             decision = {'option': '--drop',
                         'name': 'Using Append',
@@ -143,7 +157,7 @@ class recommendation(object):
     def calculate_max_osm2pgsql_cache(self):
         """Calculates the max RAM server has available to dedicate to osm2pgsql cache.
 
-        Using 2/3 total as a starting point
+        Using 2/3 of reported system total.
 
 		Returns
 		-----------------------
@@ -155,12 +169,14 @@ class recommendation(object):
     def calculate_osm2pgsql_noslim_cache(self):
         """Calculates cache required by osm2pgsql in order to run w/out slim.
 
-        https://blog.rustprooflabs.com/2021/05/osm2pgsql-reduced-ram-load-to-postgis
+        Uses basic calculation based on the size of the PBF size being imported.
+
+        Justification: https://blog.rustprooflabs.com/2021/05/osm2pgsql-reduced-ram-load-to-postgis
 
         Returns
         --------------------
         required_gb : float
-            Value of memory (in GB) estimated for osm2pgsql to run w/out slim mode.
+            Estimated memory (in GB) osm2pgsql will use if running w/out slim mode.
         """
         required_gb = 1 + (2.5 * self.osm_pbf_gb)
         return required_gb
@@ -169,11 +185,14 @@ class recommendation(object):
     def run_in_ram(self):
         """Determines if bypassing --slim is an option with the given details.
 
+        Uses details about append mode, RAM available and the size of the input
+        PBF to make determination.
+
         Returns
         --------------------
         in_ram_possible : bool
         """
-        if self.append:
+        if self.slim_no_drop:
             in_ram_possible = False
             decision = {'option': '--slim',
                         'name': 'Using Append',
@@ -201,33 +220,44 @@ class recommendation(object):
         """
         cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
 
-        if self.osm2pgsql_run_in_ram:
-            pass # Nothing to do here
-        else:
+        if not self.osm2pgsql_run_in_ram:
             cache = self.get_cache_mb()
             cmd += f' --cache={cache} \ \n'
             cmd += ' --slim \ \n'
             if self.osm2pgsql_drop:
                 cmd += ' --drop \ \n'
             if self.osm2pgsql_flat_nodes:
-                cmd += ' --flat-nodes=/tmp/nodes \ \n'
+                nodes_path = '/tmp/nodes'
+                cmd += f' --flat-nodes={nodes_path} \ \n'
+
+        # Create is default, being extra verbose and always adding it now
+        osm2pgsql_mode = ' --create '
+
+        # Support for getting command for subsequent imports in append mode
+        if self.slim_no_drop and not self.append_first_run:
+            osm2pgsql_mode = ' --append '
+
+        cmd += osm2pgsql_mode
 
         cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
         cmd += f' {pbf_path}'
 
         if out_format == 'api':
+            # Remove line breaks for API format
             cmd = cmd.replace('\ \n', '')
         elif out_format == 'html':
+            # Add HTML line breaks for HTML version
             cmd = cmd.replace('\n', '<br />')
         else:
             raise ValueError(f'Invalid out_format: {out_format}. Valid values are "api" and "html"')
+
         return cmd
 
 
     def get_cache_mb(self):
         """Returns cache size to set in MB.
 
-        Only needed for slim mode
+        osm2pgsql will only use a cache value > 0 while in slim mode.
 
         Returns
         ----------------------
