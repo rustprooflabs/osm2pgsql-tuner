@@ -7,13 +7,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "osm2pgsql-tuner"
-version = "0.1.0-dev"
+version = "0.1.0"
 authors = [
   { name="RustProof Labs", email="support@rustprooflabs.com" },
 ]
 description = "osm2pgsql-tuner project recommends an osm2pgsql command based on available system resources and the size of the input PBF file."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
