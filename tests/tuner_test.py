@@ -173,21 +173,16 @@ class Osm2pgsqlTests(unittest.TestCase):
     def test_osm2pgsql_recommendation_osm2pgsql_get_osm2pgsql_command_value_not_in_ram(self):
         rec = tuner.Recommendation(SYSTEM_RAM_GB_SMALL, OSM_PBF_GB_US)
         pbf_path = 'blahblah'
-        result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
+        result = rec.get_osm2pgsql_command(pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --drop  --flat-nodes=/tmp/nodes  --create  --output=flex --style=./run.lua  {pbf_path}'
         self.assertEqual(expected, result)
 
     def test_osm2pgsql_recommendation_osm2pgsql_get_osm2pgsql_command_value_is_in_ram(self):
         rec = tuner.Recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US)
         pbf_path = 'blahblah'
-        result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
+        result = rec.get_osm2pgsql_command(pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --create  --output=flex --style=./run.lua  {pbf_path}'
         self.assertEqual(expected, result)
-
-    def test_osm2pgsql_recommendation_osm2pgsql_get_osm2pgsql_command_error_invalid_type(self):
-        rec = tuner.Recommendation(SYSTEM_RAM_GB_MAIN, OSM_PBF_GB_US)
-        pbf_path = 'blahblah'
-        self.assertRaises(ValueError, rec.get_osm2pgsql_command, 'invalid', pbf_path)
 
     def test_osm2pgsql_recommendation_osm2pgsql_command_append_first_run_correct_cmd(self):
         slim_no_drop = True
@@ -196,7 +191,7 @@ class Osm2pgsqlTests(unittest.TestCase):
                                    slim_no_drop=slim_no_drop,
                                    append_first_run=append_first_run)
         pbf_path = 'blahblah'
-        result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
+        result = rec.get_osm2pgsql_command(pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --flat-nodes=/tmp/nodes  --create  --output=flex --style=./run.lua  {pbf_path}'
         self.assertEqual(expected, result)
 
@@ -207,6 +202,6 @@ class Osm2pgsqlTests(unittest.TestCase):
                                    slim_no_drop=slim_no_drop,
                                    append_first_run=append_first_run)
         pbf_path = 'blahblah'
-        result = rec.get_osm2pgsql_command(out_format='api', pbf_path=pbf_path)
+        result = rec.get_osm2pgsql_command(pbf_path=pbf_path)
         expected = f'osm2pgsql -d $PGOSM_CONN  --cache=0  --slim  --flat-nodes=/tmp/nodes  --append  --output=flex --style=./run.lua  {pbf_path}'
         self.assertEqual(expected, result)

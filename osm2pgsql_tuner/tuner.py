@@ -43,7 +43,9 @@ class Recommendation(object):
                  pgosm_layer_set: str='run', ssd: bool=True):
         """Bootstrap the class"""
         if system_ram_gb < 2.0:
-            raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
+            url = 'https://osm2pgsql.org/doc/manual.html#main-memory'
+            msg = f'osm2pgsql requires a minimum of 2 GB RAM. See: {url}'
+            raise ValueError(msg)
 
         if slim_no_drop and append_first_run is None:
             raise ValueError('append_first_run must be set when slim_no_drop is true.')
@@ -207,30 +209,28 @@ class Recommendation(object):
         return in_ram_possible
 
 
-    def get_osm2pgsql_command(self, out_format: str, pbf_path: str) -> str:
+    def get_osm2pgsql_command(self, pbf_path: str) -> str:
         """Builds the recommended osm2pgsql command.
 
         Parameters
         -----------------------
-        out_format : str
-            Either `api` or `html`.
         pbf_path : str
 
         Returns
         -----------------------
         cmd : str
         """
-        cmd = 'osm2pgsql -d $PGOSM_CONN \ \n'
+        cmd = 'osm2pgsql -d $PGOSM_CONN '
 
         if not self.osm2pgsql_run_in_ram:
             cache = self.get_cache_mb()
-            cmd += f' --cache={cache} \ \n'
-            cmd += ' --slim \ \n'
+            cmd += f' --cache={cache} '
+            cmd += ' --slim '
             if self.osm2pgsql_drop:
-                cmd += ' --drop \ \n'
+                cmd += ' --drop '
             if self.osm2pgsql_flat_nodes:
                 nodes_path = '/tmp/nodes'
-                cmd += f' --flat-nodes={nodes_path} \ \n'
+                cmd += f' --flat-nodes={nodes_path} '
 
         # Create is default, being extra verbose and always adding it now
         osm2pgsql_mode = ' --create '
@@ -241,17 +241,8 @@ class Recommendation(object):
 
         cmd += osm2pgsql_mode
 
-        cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua \ \n'
+        cmd += f' --output=flex --style=./{self.pgosm_layer_set}.lua '
         cmd += f' {pbf_path}'
-
-        if out_format == 'api':
-            # Remove line breaks for API format
-            cmd = cmd.replace('\ \n', '')
-        elif out_format == 'html':
-            # Add HTML line breaks for HTML version
-            cmd = cmd.replace('\n', '<br />')
-        else:
-            raise ValueError(f'Invalid out_format: {out_format}. Valid values are "api" and "html"')
 
         return cmd
 
