@@ -132,7 +132,7 @@ coverage run -m unittest tests/*.py
 Generate report.
 
 ```bash
-coverage report -m osm2pgsql_tuner/*.py webapp/*.py
+coverage report -m osm2pgsql_tuner/*.py
 ```
 
 
@@ -140,7 +140,6 @@ Run pylint.
 
 ```bash
 pylint --rcfile=./.pylintrc -f parseable \
-    ./webapp/*.py \
     ./osm2pgsql_tuner/*.py
 ```
 
