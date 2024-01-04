@@ -1,6 +1,6 @@
 """Contains osm2pgsql class to help provide osm2pgsql tuning advice.
 
-Recommendations require osm2pgsql v1.5.0 or newer
+Recommendations are targeted for osm2pgsql v1.5.0 and newer.
 """
 
 
@@ -37,8 +37,10 @@ class recommendation(object):
         (Default True) Is the osm2pgsql server using SSD for storage? Value determines threshold
         for decision to use `--flat-nodes`
     """
-    def __init__(self, system_ram_gb, osm_pbf_gb, slim_no_drop=False,
-                 append_first_run=None, pgosm_layer_set='run', ssd=True):
+    def __init__(self, system_ram_gb: float, osm_pbf_gb: float,
+                 slim_no_drop: bool=False,
+                 append_first_run: bool=None,
+                 pgosm_layer_set: str='run', ssd: bool=True):
         """Bootstrap the class"""
         if system_ram_gb < 2.0:
             raise ValueError('osm2pgsql requires a minimum of 2 GB RAM. See https://osm2pgsql.org/doc/manual.html#main-memory')
@@ -68,7 +70,7 @@ class recommendation(object):
         self.osm2pgsql_limited_ram = self.limited_ram_check()
 
 
-    def limited_ram_check(self):
+    def limited_ram_check(self) -> bool:
         """Decide if osm2pgsql can use more RAM than the system has available.
 
         Returns
@@ -86,7 +88,7 @@ class recommendation(object):
         # enough info already?
         return False
 
-    def use_flat_nodes(self):
+    def use_flat_nodes(self) -> bool:
         """Returns `True` if `--flat-nodes` should be used.
 
         Use `--flat-nodes` when:
@@ -125,7 +127,7 @@ class recommendation(object):
         return False
 
 
-    def use_drop(self):
+    def use_drop(self) -> bool:
         """Checks other parameters to determine if --drop should be used.
 
         Returns
@@ -154,7 +156,7 @@ class recommendation(object):
         return use_drop
 
 
-    def calculate_max_osm2pgsql_cache(self):
+    def calculate_max_osm2pgsql_cache(self) -> float:
         """Calculates the max RAM server has available to dedicate to osm2pgsql cache.
 
         Using 2/3 of reported system total.
@@ -166,7 +168,7 @@ class recommendation(object):
         osm2pgsql_cache_max = self.system_ram_gb * 0.66
         return osm2pgsql_cache_max
 
-    def calculate_osm2pgsql_noslim_cache(self):
+    def calculate_osm2pgsql_noslim_cache(self) -> float:
         """Calculates cache required by osm2pgsql in order to run w/out slim.
 
         Uses basic calculation based on the size of the PBF size being imported.
@@ -182,7 +184,7 @@ class recommendation(object):
         return required_gb
 
 
-    def run_in_ram(self):
+    def run_in_ram(self) -> bool:
         """Determines if bypassing --slim is an option with the given details.
 
         Uses details about append mode, RAM available and the size of the input
@@ -205,7 +207,7 @@ class recommendation(object):
         return in_ram_possible
 
 
-    def get_osm2pgsql_command(self, out_format, pbf_path):
+    def get_osm2pgsql_command(self, out_format: str, pbf_path: str) -> str:
         """Builds the recommended osm2pgsql command.
 
         Parameters
@@ -254,7 +256,7 @@ class recommendation(object):
         return cmd
 
 
-    def get_cache_mb(self):
+    def get_cache_mb(self) -> int:
         """Returns cache size to set in MB.
 
         osm2pgsql will only use a cache value > 0 while in slim mode.
