@@ -10,7 +10,7 @@ FLAT_NODES_THRESHOLD_GB = 8.0
 8-10 GB appears to be an appropriate threshold when using modern SSDs for storage.
 """
 
-class Recommendation(object):
+class Recommendation():
     """Takes basic inputs to generate command recommendations for osm2pgsql.
 
     Parameters
@@ -57,11 +57,11 @@ class Recommendation(object):
         self.pgosm_layer_set = pgosm_layer_set
         self.ssd = ssd
 
-        self.decisions = list()
+        self.decisions = []
 
         # Calculated attributes
         self.osm2pgsql_cache_max = self.calculate_max_osm2pgsql_cache()
-        self.osm2pgsql_noslim_cache = self.calculate_osm2pgsql_noslim_cache()
+        self.osm2pgsql_noslim_cache = self.get_osm2pgsql_noslim_cache()
         # No real method to this calculation, initial gut instinct
         self.osm2pgsql_slim_cache = 0.75 * self.osm2pgsql_noslim_cache
 
@@ -83,7 +83,8 @@ class Recommendation(object):
             # If running w/out slim is possible, already determined there is
             # enough RAM.
             return False
-        elif self.osm2pgsql_slim_cache > self.osm2pgsql_cache_max:
+
+        if self.osm2pgsql_slim_cache > self.osm2pgsql_cache_max:
             return True
 
         # Is this possible to reach? Does self.osm2pgsql_run_in_ram provide
@@ -109,13 +110,15 @@ class Recommendation(object):
                         'desc': 'No reason to consider --flat-nodes'}
             self.decisions.append(decision)
             return False
-        elif self.osm_pbf_gb >= FLAT_NODES_THRESHOLD_GB and self.ssd:
+
+        if self.osm_pbf_gb >= FLAT_NODES_THRESHOLD_GB and self.ssd:
             decision = {'option': '--flat-node',
                         'name': 'File of sufficient size',
                         'desc': 'File is large enough to consider --flat-nodes'}
             self.decisions.append(decision)
             return True
-        elif self.osm_pbf_gb >= 30.0:
+
+        if self.osm_pbf_gb >= 30.0:
             decision = {'option': '--flat-node',
                         'name': 'File of sufficient size',
                         'desc': 'File is large enough to consider --flat-nodes'}
@@ -170,7 +173,7 @@ class Recommendation(object):
         osm2pgsql_cache_max = self.system_ram_gb * 0.66
         return osm2pgsql_cache_max
 
-    def calculate_osm2pgsql_noslim_cache(self) -> float:
+    def get_osm2pgsql_noslim_cache(self) -> float:
         """Calculates cache required by osm2pgsql in order to run w/out slim.
 
         Uses basic calculation based on the size of the PBF size being imported.
