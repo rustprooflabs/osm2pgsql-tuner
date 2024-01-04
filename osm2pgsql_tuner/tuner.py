@@ -10,7 +10,7 @@ FLAT_NODES_THRESHOLD_GB = 8.0
 8-10 GB appears to be an appropriate threshold when using modern SSDs for storage.
 """
 
-class recommendation(object):
+class Recommendation(object):
     """Takes basic inputs to generate command recommendations for osm2pgsql.
 
     Parameters

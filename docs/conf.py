@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'osm2pgsql tuner'
-copyright = '2022, RustProof Labs'
+copyright = '2022 - 2024, RustProof Labs'
 author = 'RustProof Labs'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.5'
+release = '0.1.0-dev'
 
 
 # -- General configuration ---------------------------------------------------
@@ -49,7 +49,7 @@ extensions.append('autoapi.extension')
 autoapi_type = 'python'
 # Leaving out tests for now, fails autoapi w/ error:
 #    exception: Relative import with too many levels (1) for module 'tuner_test'
-autoapi_dirs = ['../webapp', '../osm2pgsql_tuner']
+autoapi_dirs = ['../osm2pgsql_tuner']
 
 # -- Options for HTML output -------------------------------------------------
 
