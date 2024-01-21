@@ -5,7 +5,7 @@ Recommendations are targeted for osm2pgsql v1.5.0 and newer.
 
 
 FLAT_NODES_THRESHOLD_GB = 8.0
-"""float : Sets threshold size for when to use --flat-nodes.
+"""float : Sets threshold size for when to use ``--flat-nodes``.
 
 8-10 GB appears to be an appropriate threshold when using modern SSDs for storage.
 """
