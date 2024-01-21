@@ -11,49 +11,9 @@ The recommendations made by this program are targeted for:
 Stage 2 processing has less predictable RAM consumption
 [per this discussion on GitHub](https://github.com/openstreetmap/osm2pgsql/discussions/1536).
 
+[API Documentation](https://rustprooflabs.github.io/osm2pgsql-tuner/autoapi/osm2pgsql_tuner/index.html) available.
 
 
-## Using the API
-
-This project is hosted as a free API at https://osm2pgsql-tuner.com by RustProof Labs.
-The following is an example of using this API from Python.
-
-```python
-import requests
-
-system_ram_gb = 64
-osm_pbf_gb = 10.4
-pbf_filename = 'north-america-latest'
-append = False
-
-api_endpoint = 'https://osm2pgsql-tuner.com/api/v1'
-api_endpoint += f'?system_ram_gb={system_ram_gb}&osm_pbf_gb={osm_pbf_gb}&append={append}&pbf_filename={pbf_filename}'
-```
-
-Query the endpoint, check the status.
-
-```python
-result = requests.get(api_endpoint)
-print(f'Status code: {result.status_code}')
-```
-
-Get recommendation data.
-
-```python
-rec = result.json()['osm2pgsql']
-```
-
-Command is the most interesting part.
-
-```python
-print(f"\nCommand:\n{rec['cmd']} ")
-```
-
-Other details returned used in decision making to determine the command `cmd`.
-
-```python
-print(rec.keys())
-```
 
 ## Using osm2pgsql via Python
 
@@ -70,19 +30,18 @@ Import `osm2pgsql_tuner` and create an instance of the `recommendation` class.
 
 ```python
 import osm2pgsql_tuner
-rec = osm2pgsql_tuner.recommendation(system_ram_gb=8,
+rec = osm2pgsql_tuner.Recommendation(system_ram_gb=8,
                                      osm_pbf_gb=0.5,
                                      pgosm_layer_set='run')
 pbf_path = '~/pgosm-data/example_file.osm.pbf'
-osm2pgsql_command = rec.get_osm2pgsql_command(out_format='api',
-                                              pbf_path=pbf_path)
+osm2pgsql_command = rec.get_osm2pgsql_command(pbf_path=pbf_path)
 print(osm2pgsql_command)
 ```
 
 Returns.
 
 ```bash
-osm2pgsql -d $PGOSM_CONN  --output=flex --style=./run.lua  ~/pgosm-data/example_file.osm.pbf
+osm2pgsql -d $PGOSM_CONN  --create  --output=flex --style=./run.lua  ~/pgosm-data/example_file.osm.pbf
 ```
 
 
@@ -98,7 +57,7 @@ python3.8 -m venv osm2pgsql-tuner
 source ~/venv/osm2pgsql-tuner/bin/activate
 ```
 
-Install requirements
+Install requirements.
 
 ```bash
 source ~/venv/osm2pgsql-tuner/bin/activate
