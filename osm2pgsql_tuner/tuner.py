@@ -19,23 +19,23 @@ class Recommendation():
         How much total RAM the server has, in GB.
 
     osm_pbf_gb : float
-        Size of the `.osm.pbf` file in GB.
+        Size of the ``.osm.pbf`` file in GB.
 
     slim_no_drop : bool
-        (Default False) Setup to use osm2pgsql --append. When true --slim must be used.
+        (Default False) Setup to use osm2pgsql ``--append``. When true ``--slim`` must be used.
 
     append_first_run : bool or None
-        (Default None) If `slim_no_drop` is True, `append_first_run` must be set.
-        Used to determine if `--create` or `--append` is passed to osm2pgsql.
+        (Default None) If `slim_no_drop` is True, ``append_first_run`` must be set.
+        Used to determine if ``--create`` or ``--append`` is passed to osm2pgsql.
 
     pgosm_layer_set : str
-        (Default (run) Base name of `.lua` script to run.
+        (Default (run) Base name of ``.lua`` script to run.
 
         PgOSM Flex uses the `run` entry point.
 
     ssd : bool
         (Default True) Is the osm2pgsql server using SSD for storage? Value determines threshold
-        for decision to use `--flat-nodes`
+        for decision to use ``--flat-nodes``
     """
     def __init__(self, system_ram_gb: float, osm_pbf_gb: float,
                  slim_no_drop: bool=False,
@@ -92,9 +92,9 @@ class Recommendation():
         return False
 
     def use_flat_nodes(self) -> bool:
-        """Returns `True` if `--flat-nodes` should be used.
+        """Returns `True` if ``--flat-nodes`` should be used.
 
-        Use `--flat-nodes` when:
+        Use ``--flat-nodes`` when:
             * PBF size is larger than config'd threshold AND SSD
             * PBF >= 30 GB (regardless of SSD)
 
@@ -133,7 +133,7 @@ class Recommendation():
 
 
     def use_drop(self) -> bool:
-        """Checks other parameters to determine if --drop should be used.
+        """Checks other parameters to determine if ``--drop`` should be used.
 
         Returns
         -----------------------
@@ -190,7 +190,7 @@ class Recommendation():
 
 
     def run_in_ram(self) -> bool:
-        """Determines if bypassing --slim is an option with the given details.
+        """Determines if bypassing ``--slim`` is an option with the given details.
 
         Uses details about append mode, RAM available and the size of the input
         PBF to make determination.
