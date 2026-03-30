@@ -2,6 +2,7 @@
 
 Recommendations are targeted for osm2pgsql v1.5.0 and newer.
 """
+from pathlib import Path
 
 
 FLAT_NODES_THRESHOLD_GB = 8.0
@@ -212,16 +213,8 @@ class Recommendation():
         return in_ram_possible
 
 
-    def get_osm2pgsql_command(self, pbf_path: str) -> str:
+    def get_osm2pgsql_command(self, pbf_path: Path | str) -> str:
         """Builds the recommended osm2pgsql command.
-
-        Parameters
-        -----------------------
-        pbf_path : str
-
-        Returns
-        -----------------------
-        cmd : str
         """
         cmd = 'osm2pgsql -d $PGOSM_CONN '
 
